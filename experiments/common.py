@@ -109,3 +109,13 @@ def write_provenance(ctx: RunContext, params: dict, dataset: str = "synthetic (n
         "elapsed_s": elapsed_s,
         "written_at_unix": int(time.time()),
     })
+
+
+def pmap(fn, args: list, workers: int) -> list:
+    """Order-preserving map over ``args``, in worker processes when ``workers > 1``. ``fn`` must be a
+    picklable top-level function."""
+    if workers > 1 and len(args) > 1:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(max_workers=workers) as ex:
+            return list(ex.map(fn, args))
+    return [fn(a) for a in args]

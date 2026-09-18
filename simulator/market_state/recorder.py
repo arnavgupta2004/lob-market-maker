@@ -30,12 +30,14 @@ class MarketRecorder:
     _rows: list = field(default_factory=list)
     _trades: list = field(default_factory=list)
     _mid_before: list = field(default_factory=list)
+    _ids: list = field(default_factory=list)
 
     def on_event(self, ev: Event) -> None:
         if ev.type is EventType.TRADE:
             # (t_ns, price_ticks, qty, aggressor_sign, taker_owner, maker_owner)
             self._trades.append((ev.ts, ev.price, ev.qty, int(ev.side), ev.owner, ev.maker_owner))
             self._mid_before.append(self.pre_mid)
+            self._ids.append((ev.order_id, ev.maker_id))
 
     def sample(self, t: int, book: OrderBook, fundamental_ticks: float = _NAN) -> None:
         b, a = book.best_bid(), book.best_ask()
@@ -65,4 +67,6 @@ class MarketRecorder:
         arr = np.array(self._trades, dtype=np.int64).reshape(-1, len(cols))
         out = {c: arr[:, i] for i, c in enumerate(cols)}
         out["mid_before"] = np.array(self._mid_before, dtype=float)
+        ids = np.array(self._ids, dtype=np.int64).reshape(-1, 2)
+        out["taker_id"], out["maker_id"] = ids[:, 0], ids[:, 1]
         return out

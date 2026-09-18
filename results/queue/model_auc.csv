@@ -1,0 +1,9 @@
+env,model,features,auc_test,n_test,base_rate
+noise,Q_only,log1p_Q,0.5005972482117389,50460,0.3454221165279429
+noise,Q+d_touch,"log1p_Q,d_touch",0.8080195024290753,50460,0.3454221165279429
+noise,Q+d_touch+spread,"log1p_Q,d_touch,spread",0.8098323252787978,50460,0.3454221165279429
+noise,full,"log1p_Q,d_touch,spread,log1p_depth5,abs_ret1s,signed_ret1s,log1p_flow1s,signed_obi",0.8310873284235945,50460,0.3454221165279429
+informed,Q_only,log1p_Q,0.5283325576893971,38192,0.4088290741516548
+informed,Q+d_touch,"log1p_Q,d_touch",0.7783149153639826,38192,0.4088290741516548
+informed,Q+d_touch+spread,"log1p_Q,d_touch,spread",0.7800992155364612,38192,0.4088290741516548
+informed,full,"log1p_Q,d_touch,spread,log1p_depth5,abs_ret1s,signed_ret1s,log1p_flow1s,signed_obi",0.7927740002200986,38192,0.4088290741516548

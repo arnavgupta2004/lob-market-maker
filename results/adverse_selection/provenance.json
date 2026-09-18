@@ -1,0 +1,81 @@
+{
+  "command": "python -m experiments.run adverse_selection --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 6.558496952056885,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "adverse_selection",
+  "git": {
+    "commit": "b3b887e1a1549323511056d2826e9cb3478d1e64",
+    "dirty": true
+  },
+  "parameters": {
+    "calibration_seeds": [
+      4250000,
+      4250001,
+      4250002,
+      4250003,
+      4250004,
+      4250005,
+      4250006,
+      4250007,
+      4250008,
+      4250009,
+      4250010,
+      4250011
+    ],
+    "envs": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "noise": {
+        "informed": null
+      }
+    },
+    "gamma": 0.01,
+    "horizon_s": 180.0,
+    "horizons": {
+      "100ms": 100000000,
+      "10ms": 10000000,
+      "1s": 1000000000,
+      "500ms": 500000000,
+      "50ms": 50000000
+    },
+    "k": {
+      "informed": 0.5652427496657185,
+      "noise": 0.9388129235876298
+    },
+    "sessions": 24
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "adverse_selection.png": "455681a029ebd39e261fcab06f6b6471044779cd58789c9de681de78fc83025e",
+    "post_fill_markouts.csv": "ca38ce46490eaf6e06cf7cb905f248afa5792d1172e2cb25f210275e8c2e4584",
+    "summary.json": "09d7281e7c4a421690ce36690d864425d190a17b5e426e515609e73312d52b49"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789767318
+}

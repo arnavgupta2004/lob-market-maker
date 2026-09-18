@@ -1,0 +1,79 @@
+{
+  "command": "python -m experiments.run imbalance --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 6.398179054260254,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "imbalance",
+  "git": {
+    "commit": "b3b887e1a1549323511056d2826e9cb3478d1e64",
+    "dirty": true
+  },
+  "parameters": {
+    "envs": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "noise": {
+        "informed": null
+      }
+    },
+    "horizon_s": 300.0,
+    "horizons_s": [
+      0.01,
+      0.05,
+      0.1,
+      0.5,
+      1.0,
+      5.0
+    ],
+    "sample_dt_s": 0.01,
+    "sessions": 24,
+    "variants": {
+      "L1": {
+        "levels": 1,
+        "only_spread": null
+      },
+      "L1_spread1": {
+        "levels": 1,
+        "only_spread": 1
+      },
+      "L5": {
+        "levels": 5,
+        "only_spread": null
+      }
+    }
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "imbalance.png": "730658c9a2f56950d303350610afecdb8a9c763287b11603eaf43ac1bb404c59",
+    "obi_bins.csv": "abb9082aa9907d6741b93656990df724a6cbe340391d0708b512ea0600190542",
+    "summary.csv": "ff137a8157a101023881ca92f53b113fc393cff4545160f19d695aaa2af49268",
+    "summary.json": "75ecf43881b9635390f80a07906425e69b8d763b6130ae8f5d06cb9b83f11d12"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789767303
+}

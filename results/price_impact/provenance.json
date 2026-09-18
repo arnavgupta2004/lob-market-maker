@@ -1,0 +1,75 @@
+{
+  "command": "python -m experiments.run price_impact --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 5.4436399936676025,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "price_impact",
+  "git": {
+    "commit": "b3b887e1a1549323511056d2826e9cb3478d1e64",
+    "dirty": true
+  },
+  "parameters": {
+    "envs": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "noise": {
+        "informed": null
+      }
+    },
+    "horizon_s": 300.0,
+    "impact_keys": [
+      "I_0",
+      "I_0.1s",
+      "I_1s",
+      "I_5s",
+      "slippage"
+    ],
+    "sessions": 24,
+    "size_edges": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      9,
+      14,
+      21,
+      32,
+      50,
+      10000
+    ]
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "alpha_fits.csv": "9ba278054ce20c655e8bbf406e4aee833bb5310ed69761fd7b9176ac15af08fd",
+    "impact_by_size.csv": "7906614af4922bfca55d48f368c494fbabebb23d273a5f32a615ab243f565146",
+    "price_impact.png": "3c166042fd211190e071f7624531dfdacbf70c39d080a64728bb8b3a76a94c98"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789767323
+}

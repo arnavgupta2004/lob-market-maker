@@ -22,6 +22,10 @@ from experiments.common import RunContext
 REGISTRY = {
     "as_assumptions": "experiments.baseline.as_assumptions",
     "inventory": "experiments.inventory.gamma_sweep",
+    "imbalance": "experiments.imbalance.obi_predictiveness",
+    "queue": "experiments.queue.fill_probability",
+    "adverse_selection": "experiments.adverse_selection.post_fill",
+    "price_impact": "experiments.price_impact.impact_curve",
 }
 
 
