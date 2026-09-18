@@ -20,6 +20,25 @@ python -m experiments.run inventory --seed 42 --workers 8
 (what those measurements do and do not support). Results marked "simulator" describe the simulator, not real markets; the real-data section says what
 was measured on one recorded hour of one instrument.
 
+## At a glance
+
+![Simulated market: price discovery, L2 depth, spread](docs/figures/hero_market.png)
+*A 90 s simulated session (noise + informed flow, seed 7; `scripts/make_readme_figures.py`): the mid tracks the latent fundamental, the book shows resting depth on both sides, and the spread is 1-3 ticks ~90% of the time.*
+
+```mermaid
+flowchart LR
+    F[Fundamental process<br/>Brownian / OU / jumps] --> S
+    N[Order flow<br/>noise, informed, Hawkes, metaorders] --> S
+    H[Historical replay<br/>Kraken L2 + trades] --> S
+    S[Discrete-event simulator<br/>ns clock, latency, per-name RNG] <--> B[(Order book<br/>Python reference / C++ engine)]
+    M[Market makers<br/>AS baseline, adaptive] <--> S
+    B --> T[Event stream + tape<br/>hashed, replayable]
+    T --> A[Backtest metrics + research<br/>P&L decomposition, adverse selection,<br/>queue, impact, stylized facts]
+    A --> E[Experiments<br/>sweeps, ablations, bootstrap CIs]
+```
+
+The figures below are regenerated from the committed `results/` CSVs by `python scripts/make_readme_figures.py`; each sits next to the section that explains the method.
+
 ---------------------------------------------------------------------------------------------------
 
 ## 1. Motivation
@@ -101,11 +120,17 @@ Measured *directly* (no VPIN-style proxy) on exchange ground truth. For a passiv
 move `M_h = s(m_{t+h} - m^-)` (negative = adverse) at 10 ms - 1 s (and longer on real data), realised half-spread `R_h = E + M_h`. A **null control** (same statistic at random times / random sides) must be ~0 for
 fill-conditioned values to be attributable to the fills. Breakdowns: by taker type (known in the simulator), by inventory effect, by imbalance at the fill. (`research/adverse_selection.py`)
 
+![Post-fill adverse markouts, simulator and real data](docs/figures/adverse_selection.png)
+*Signed post-fill mid move after passive fills (mean with 95% CI). The grey null control (random times) is ~0, so the drift is attributable to the fills. Left: simulator, larger against informed takers. Right: the same estimator on the recorded Kraken hour (note the units are 0.1 USD ticks, so the magnitudes are not comparable across panels).*
+
 ## 10. Queue-position methodology
 
 A probe posts 1-lot post-only orders at and behind the touch and reads its exact quantity-ahead `Q_t` from the book every 250 ms together with spread, depth, volatility, flow and signed imbalance; the outcome is
 "filled within dt". Only fully observed windows are used (no censoring bias). Estimators: empirical `P(fill | Q)` by bin and a logistic model, evaluated out of sample (AUC), with session-level bootstrap. Lesson recorded
 in the analysis: stratify by the *current* distance from the touch, not the distance at posting, or `Q` looks uninformative. (`research/queue_position.py`)
+
+![Fill probability versus queue position](docs/figures/queue_fill_probability.png)
+*P(fill within 1 s) versus quantity ahead, by distance from the touch (95% CIs). The grey pooled curve is non-monotone because distance confounds it; stratified curves fall with queue-ahead.*
 
 ## 11. Backtesting methodology
 
@@ -135,6 +160,9 @@ before use (`research/stylized_facts.py`, `research/resilience.py`). These are r
 C++ per-command latency is under ~0.2 us (clock resolution ~42 ns) versus 1.5 - 6.5 us in Python; memory per resting order is ~15% lower. The honest conclusion: the C++ core is much faster, but from Python that only materialises with
 coarse-grained calls; the simulator's per-command loop gains parity, not speed. (`docs/stage6_cpp_engine_findings.md`)
 
+![C++ versus Python engine speedup](docs/figures/engine_speedup.png)
+*Speedup of the C++ engine over the Python engine by driving mode (log scale). The last bars, one call per command through the drop-in wrapper, sit at ~1x.*
+
 ## 15. Results
 
 Full write-ups with hypotheses, methods, intervals and limitations are in `docs/`. Headlines (all *simulator* results unless marked real):
@@ -151,11 +179,23 @@ Full write-ups with hypotheses, methods, intervals and limitations are in `docs/
 | **G. Stylized facts** | Each flow mechanism fixes what it targets (informed -> sign persistence, Hawkes -> arrival clustering, metaorders -> sign memory). **Persistent volatility clustering is absent** in every simulator variant (and not detected in the one real hour either); the kurtosis "pass" is inflated by price discreteness; the mid's impact is permanent in the noise-only market (no resilience). `stage8_replay_and_validation.md` |
 | **Ablations / sweeps** | Response surfaces of P&L, Sharpe, drawdown, fill rate, adverse cost over gamma x size, gamma x latency, inventory limit x gamma, half-spread x size (P&L plateaus from ~2 ticks), volatility x flow intensity, and the adaptive coefficients. AS is fragile at low order-flow intensity; adaptive P&L is insensitive to its coefficients within +-2. |
 
+![Inventory control versus risk aversion](docs/figures/inventory_gamma.png)
+*Finding E. Raising risk aversion gamma collapses mean |inventory| but costs P&L, more so against informed flow (mean with 95% CI over sessions).*
+
+![Latency sensitivity](docs/figures/latency.png)
+*Finding D. Net P&L versus one-way latency. The adaptive maker degrades; the AS baseline's rise is skew damping (see the table row), not a benefit. Interval overlap is large at most latencies; read the paired effects in `stage9_experiments.md`.*
+
+![Ablation ladder](docs/figures/ablation_ladder.png)
+*Finding F. Incremental effect of adding each component in order, paired across seeds. Inventory control removes ~20 lots of mean |inventory| but its P&L effect depends on the environment (negative under noise flow, positive with informed flow; not robust to replication); the queue rule is the most consistently positive; other effects are small.*
+
 **Real data (one recorded hour, Kraken BTC/USD):** Kraken BTC/USD, 3,597 s of continuous L2 + trade data (61 MB, recorded 2026-09-18 22:42-23:42 UTC; `docs/stage8b_real_data.md`). Integrity: the reconstructed book matches the exchange's own top-10 checksum on **100.000%** of 262,671 updates; replay reproduces the feed's touch
 after 99.8% of updates with 0/4,044 mis-priced trades. Against the simulator, using identical estimators: **agreement** on persistent order signs (lag-1 ACF 0.144 [0.081, 0.198]; exponent 0.33 [0.21, 0.45]) and clustered arrivals (Fano 2.27 [1.67, 2.93]); **disagreement** on scale (~22 vs ~2
 ticks/sqrt(s)), trending vs mean-reverting mid (VR(60) = 1.98 vs ~0.75), positive vs negative 0.1 s return autocorrelation, heavy-tailed order sizes (Hill 1.4 vs 3.3-4), and **concave, weakly size-dependent price impact** (alpha 0.13 [0.02, 0.26] at 1 s; simulator ~1). Order-book imbalance predicts the mid
 *more* at longer horizons (corr 0.26 [0.18, 0.34] at 5 s) and its extreme-bin move (+8.7 ticks at 1 s) is large relative to the spread but ~10x smaller than a 1 bp fee. Historical maker fills are strongly adverse (mean M_500ms -25 ticks, null ~0). **On replayed real flow every market-making arm lost money** (gross -1.2 to
 -1.5 bp of traded notional, statistically below 0; net of fees -2.2 to -2.5 bp): the +16-tick half-spread captured is about a third of the -47-tick post-fill move. Inventory control still cut mean inventory by ~40%. One hour of one instrument: block-bootstrap intervals, 8 evaluation windows, no generalisation claimed.
+
+![Real versus simulated](docs/figures/real_vs_simulated.png)
+*Left: order-book-imbalance predictability, real (block-bootstrap CI) versus simulator: the real book is more predictive at longer horizons, the opposite of the simulator. Right: market-making arms replayed on real flow, gross P&L in bp of traded notional (95% CI): all negative.*
 
 ## 16. Limitations
 
