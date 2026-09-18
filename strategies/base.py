@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from backtest.costs import FeeModel
-from engine.commands import Cancel, Command, NewLimit, NewMarket
+from engine.commands import Cancel, Command, Modify, NewLimit, NewMarket
 from engine.common import EventType as ET, Side
 from engine.events import Event
 from engine.python.order_book import OrderBook
@@ -54,6 +54,7 @@ class MMConfig:
     max_drawdown: float = math.inf  # currency units, from running peak of believed MtM equity
     flatten_on_kill: bool = True
     requote_on_fill: bool = True
+    modify_to_shrink: bool = False  # shrink a resting quote in place (keeps queue priority) instead of cancel+repost
     vol_halflife_s: float = 10.0
     sigma0: float = 2.0  # prior for volatility, ticks / sqrt(s)
     sigma_bounds: Optional[tuple[float, float]] = (0.05, 10.0)  # clamp on the EWMA estimate; None = off
@@ -94,6 +95,7 @@ class MarketMaker(Participant):
         self.n_flatten = 0
         self.n_sigma_clamped = 0
         self.n_offset_clamped = 0
+        self.ack_latency_s: Optional[float] = None  # EWMA of (own ADD seen - own order sent): order + feed latency
         self._live: dict[Side, Optional[_Live]] = {Side.BUY: None, Side.SELL: None}
         self._var = cfg.sigma0 ** 2  # ticks^2 / s
         self._vol_last: Optional[tuple[int, float]] = None
@@ -110,6 +112,14 @@ class MarketMaker(Participant):
         Called with the replica mid. The base class afterwards clamps sizes to the inventory
         limits and prices so that a post-only order cannot cross the replica book.
         """
+
+    def keep_quote(self, side: Side, cur: "_Live", want: Quote) -> bool:
+        """Hook: return True to leave the resting quote ``cur`` untouched although ``want`` (a different
+        price) is desired. The default never keeps a stale price; queue-aware strategies override it."""
+        return False
+
+    def _pre_apply(self, ev: Event) -> None:
+        """Hook called immediately *before* an event is applied to the replica (replica = pre-event state)."""
 
     # ---------------------------------------------------------------------- state
     @property
@@ -151,8 +161,9 @@ class MarketMaker(Participant):
     def on_events(self, sim, now: int, events: list[Event]) -> list[Command]:
         filled = False
         for ev in events:
+            self._pre_apply(ev)
             self.replica.apply_event(ev)
-            filled |= self._observe(ev)
+            filled |= self._observe(ev, now)
         cmds = self._risk_check(sim, now)
         if self.killed:
             return cmds + self._flatten(sim)
@@ -181,7 +192,7 @@ class MarketMaker(Participant):
                         self.n_sigma_clamped += 1
         self._vol_last = (now, m)
 
-    def _observe(self, ev: Event) -> bool:
+    def _observe(self, ev: Event, now: int = 0) -> bool:
         """Update beliefs from one exchange event; return True if it was an own fill."""
         me = self.owner_id
         fee = self.cfg.fees
@@ -206,6 +217,11 @@ class MarketMaker(Participant):
                     if self._flat_left <= 0:
                         self._flat_id = None
         elif ev.owner == me:
+            if ev.type is ET.ADD:
+                for lv in self._live.values():
+                    if lv is not None and lv.order_id == ev.order_id:
+                        d = (now - lv.sent_ns) / NS
+                        self.ack_latency_s = d if self.ack_latency_s is None else 0.8 * self.ack_latency_s + 0.2 * d
             if ev.type in (ET.CANCEL, ET.REJECT):
                 for side, lv in self._live.items():
                     if lv is not None and lv.order_id == ev.order_id:
@@ -268,6 +284,12 @@ class MarketMaker(Participant):
             if cur is not None:
                 if want is not None and cur.price == want[0] and 0 < cur.qty <= want[1]:
                     continue  # unchanged price: keep the order (and its queue priority)
+                if want is not None and cur.qty > 0 and cur.price == want[0] and self.cfg.modify_to_shrink:
+                    cmds.append(Modify(cur.order_id, cur.price, want[1]))  # size decrease keeps priority
+                    cur.qty = want[1]
+                    continue
+                if want is not None and cur.qty > 0 and cur.price != want[0] and cur.qty <= want[1] and self.keep_quote(side, cur, want):
+                    continue
                 cmds.append(Cancel(cur.order_id))
                 self.n_cancel += 1
                 self._live[side] = None

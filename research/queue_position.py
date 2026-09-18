@@ -218,3 +218,36 @@ def fit_logit(X: np.ndarray, y: np.ndarray, l2: float = 1e-3, iters: int = 30) -
 def predict_logit(model: dict, X: np.ndarray) -> np.ndarray:
     z = model["intercept"] + ((X - model["mean"]) / model["std"]) @ model["coef"]
     return 1 / (1 + np.exp(-z))
+
+
+# ---------------------------------------------------------------------------- fill-probability model
+@dataclass(frozen=True)
+class FillModel:
+    """Parametric fill probability ``P(fill within horizon_s | Q, d) = sigmoid(a + b_q ln(1+Q) + b_d d)``.
+
+    ``Q`` = quantity ahead in the queue (lots), ``d`` = distance in ticks from the same-side touch (0 = at the
+    touch). Fitted from :class:`QueueProbe` data by :func:`fit_fill_model` (Experiment B found these two variables
+    dominate fill probability). Used by queue-aware strategies to value queue priority.
+    """
+
+    intercept: float
+    b_q: float
+    b_d: float
+    horizon_s: float = 1.0
+
+    def p_fill(self, q: float, d: float) -> float:
+        z = self.intercept + self.b_q * math.log1p(max(q, 0.0)) + self.b_d * max(d, 0.0)
+        return 1.0 / (1.0 + math.exp(-max(min(z, 30.0), -30.0)))
+
+
+def fit_fill_model(datasets: Sequence[dict[str, np.ndarray]], delta_s: float = 1.0, dwell_s: float = 3.0) -> FillModel:
+    """Fit a :class:`FillModel` on probe datasets (only fully observed windows are used, see module docstring)."""
+    Xs, ys = [], []
+    for d in datasets:
+        y, valid = outcomes(d, delta_s, dwell_s)
+        Xs.append(np.column_stack([np.log1p(d["Q"]), d["d_touch"]])[valid])
+        ys.append(y[valid])
+    X, y = np.vstack(Xs), np.concatenate(ys)
+    m = fit_logit(X, y)
+    b = m["coef"] / m["std"]  # back to raw feature units
+    return FillModel(float(m["intercept"] - np.sum(m["coef"] * m["mean"] / m["std"])), float(b[0]), float(b[1]), delta_s)

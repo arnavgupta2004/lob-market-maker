@@ -71,6 +71,10 @@ def run_session(sc: Scenario, seed: int, keep_result: bool = True) -> Session:
         metrics.update(killed=float(mm.killed), kill_time_s=(mm.kill_time or 0) / 1e9 if mm.killed else float("nan"),
                        sigma_hat_final=mm.sigma, n_sigma_clamped=float(mm.n_sigma_clamped),
                        n_offset_clamped=float(mm.n_offset_clamped))
+        if hasattr(mm, "mean_components"):  # adaptive strategy: how large each component was, how often it acted
+            metrics.update(mm.mean_components())
+            metrics.update(n_kept_by_queue=float(mm.n_kept_by_queue), n_adverse_measured=float(mm.tracker.n_measured),
+                           ack_latency_ms=(mm.ack_latency_s or 0.0) * 1e3)
     s, tr = res.steady()
     metrics["market_trades"] = float(len(tr["price"]))
     mid = s["mid"][~_isnan(s["mid"])]
