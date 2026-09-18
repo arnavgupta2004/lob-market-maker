@@ -77,14 +77,15 @@ class SimResult:
 class Simulator:
     """Event-driven simulation of one instrument. Also the ``ctx`` handed to participants."""
 
-    def __init__(self, config: SimConfig, participants: list[Participant]):
+    def __init__(self, config: SimConfig, participants: list[Participant], book_factory=None):
         names = [p.name for p in participants]
         if len(set(names)) != len(names):
             raise ValueError(f"participant names must be unique: {names}")
         self.cfg = config
         self.participants = participants
         self.horizon_ns = int(round(config.horizon_s * NS))
-        self.book = OrderBook(record_events=config.record_events)
+        # any engine exposing the OrderBook API works (e.g. engine.cpp_engine.CppOrderBook)
+        self.book = (book_factory or OrderBook)(record_events=config.record_events)
         self.queue = EventQueue()
         self.now = 0
         self.mid_history = MidHistory()

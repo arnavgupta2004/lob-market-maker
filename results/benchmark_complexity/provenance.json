@@ -1,0 +1,32 @@
+{
+  "command": "python -m experiments.run benchmark_complexity --seed 42",
+  "dataset": "synthetic books",
+  "elapsed_s": 4.132129907608032,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "benchmark_complexity",
+  "git": {
+    "commit": "9a5e0f7800ba299fb26c73e0ccd1f2e58f33e855",
+    "dirty": true
+  },
+  "parameters": {
+    "note": "timings are hardware dependent",
+    "seed": 42
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "complexity.csv": "0376cd1531ec078f13e449c0c1cf77916d65ed31cfd45868b5a1e7dba1ee86ee",
+    "complexity.png": "e1ebe6cfe8b6845f158b20e17543aa94f12a4bf6ecd4965956c03ab43449b05d",
+    "complexity_fits.csv": "7887daa99b693e43e7b299e48ec57813d08e0a877ae90d292fbd065e963be1a3"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789768991
+}

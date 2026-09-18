@@ -292,6 +292,11 @@ class OrderBook:
         vb, va = self.volume(Side.BUY, levels), self.volume(Side.SELL, levels)
         return None if vb + va == 0 else (vb - va) / (vb + va)
 
+    def level_qty(self, side: Side, price: int) -> int:
+        """Total resting quantity at ``price`` on ``side`` (0 if no such level)."""
+        lvl = self._side(side).levels.get(price)
+        return lvl.total_qty if lvl is not None else 0
+
     def queue_position(self, order_id: int) -> Optional[tuple[int, int]]:
         """``(quantity_ahead, orders_ahead)`` of a resting order in its level's FIFO. O(position)."""
         node = self._index.get(order_id)

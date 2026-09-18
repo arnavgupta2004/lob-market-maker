@@ -114,9 +114,9 @@ class QueueProbe(Participant):
         opp = sim.book.best_ask() if side is Side.BUY else sim.book.best_bid()
         if price < 1 or (opp is not None and (price >= opp if side is Side.BUY else price <= opp)):
             return []
-        lvl = (sim.book.bids if side is Side.BUY else sim.book.asks).levels.get(price)
+        q0 = sim.book.level_qty(side, price)
         oid = sim.new_id()
-        self.probes.append(_Probe(oid, int(side), k, now, price, lvl.total_qty if lvl else 0))
+        self.probes.append(_Probe(oid, int(side), k, now, price, q0))
         self._live[oid] = len(self.probes) - 1
         heapq.heappush(self._timers, (now + self.dwell_ns, oid))
         return [NewLimit(oid, side, price, 1, owner=self.owner_id, post_only=True)]

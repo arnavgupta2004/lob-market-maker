@@ -1,0 +1,12 @@
+{
+  "build": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_COMPILER": "/usr/bin/c++",
+    "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+    "cpu": "Apple M4",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2"
+  },
+  "n_commands": 200000,
+  "reps": 5
+}

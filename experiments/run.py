@@ -26,6 +26,8 @@ REGISTRY = {
     "queue": "experiments.queue.fill_probability",
     "adverse_selection": "experiments.adverse_selection.post_fill",
     "price_impact": "experiments.price_impact.impact_curve",
+    "benchmark_engine": "benchmarks.engine_benchmark",
+    "benchmark_complexity": "benchmarks.complexity",
 }
 
 

@@ -8,6 +8,10 @@ from experiments.run import REGISTRY, main
 
 @pytest.mark.parametrize("name", sorted(REGISTRY))
 def test_experiment_quick_run_writes_results_and_provenance(name, tmp_path):
+    if name in ("benchmark_engine", "benchmark_complexity"):
+        from engine import cpp_engine
+        if not cpp_engine.available():
+            pytest.skip("C++ extension not built")
     assert main([name, "--seed", "7", "--quick", "--out", str(tmp_path)]) == 0
     out = tmp_path / name / "quick"
     prov = json.loads((out / "provenance.json").read_text())
