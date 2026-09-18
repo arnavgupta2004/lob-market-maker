@@ -19,7 +19,9 @@ def test_experiment_quick_run_writes_results_and_provenance(name, tmp_path):
     assert prov["git"]["commit"] is not None and "dirty" in prov["git"]
     assert prov["parameters"] and prov["dataset"]
     assert prov["result_file_sha256"] and all(len(h) == 64 for h in prov["result_file_sha256"].values())
-    assert any(out.glob("*.csv")) and any(out.glob("*.png"))
+    assert any(out.glob("*.csv"))
+    if name != "replay_roundtrip":  # a pure correctness check: numbers only, no figure by design
+        assert any(out.glob("*.png"))
 
 
 def test_same_seed_same_results_bytes(tmp_path):

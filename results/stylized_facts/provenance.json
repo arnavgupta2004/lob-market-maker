@@ -1,0 +1,70 @@
+{
+  "command": "python -m experiments.run stylized_facts --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 16.26904821395874,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "stylized_facts",
+  "git": {
+    "commit": "fa5f41feb7d0aff0401ab2f96c8718322f624b5b",
+    "dirty": true
+  },
+  "parameters": {
+    "checks": [
+      "heavy tails: excess kurtosis (1 s returns) > 0",
+      "vol clustering: ACF(|r|, lag 1 @1 s) > 0",
+      "vol clustering persists: ACF(|r|, lag 10 @1 s) > 0",
+      "persistent order signs: ACF(sign, lag 1) > 0",
+      "long memory: sign-ACF exponent in (0.1, 1)",
+      "arrival clustering: Fano(1 s) > 1.1",
+      "spread varies: 99th pct > median"
+    ],
+    "fano_windows_s": [
+      0.1,
+      0.3,
+      1.0,
+      3.0,
+      10.0
+    ],
+    "hawkes": "mean rate 65/s, branching 0.6, beta 8/s",
+    "horizon_s": 600.0,
+    "metaorder": {
+      "child": {
+        "median": 3.0,
+        "sigma": 0.4
+      },
+      "child_rate": 4.0,
+      "max_total": 5000,
+      "p_buy": 0.5,
+      "rate": 0.3,
+      "total": {
+        "alpha": 1.5,
+        "xm": 10.0
+      }
+    },
+    "sessions": 16,
+    "variants": [
+      "noise",
+      "informed",
+      "hawkes",
+      "hawkes+meta"
+    ]
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "curves.json": "c71edebd3fda6ad520ae95cac41b9423caa0d5f5ed6b5d5eac926acc858aba14",
+    "scoreboard.csv": "0d8613993417afe31c42f6f55b3b2a94c001f419f95acc8b4c7ce1eab711d9ca",
+    "stylized_facts.csv": "cb68be319a093738392be6c8fb29414b2f8cf937ee7ad364351aa1e3a7203be5",
+    "stylized_facts.png": "c3f6463f01390b8c2a79ab8be7e231362245a5ab52a5760a2bc5c344421bf288"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789770860
+}

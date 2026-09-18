@@ -297,6 +297,11 @@ class OrderBook:
         lvl = self._side(side).levels.get(price)
         return lvl.total_qty if lvl is not None else 0
 
+    def owner_orders_at(self, side: Side, price: int, owner: int) -> list[tuple[int, int]]:
+        """``(order_id, qty)`` of ``owner``'s resting orders at ``price`` on ``side``, in FIFO order."""
+        lvl = self._side(side).levels.get(price)
+        return [] if lvl is None else [(n.order_id, n.qty) for n in lvl if n.owner == owner]
+
     def queue_position(self, order_id: int) -> Optional[tuple[int, int]]:
         """``(quantity_ahead, orders_ahead)`` of a resting order in its level's FIFO. O(position)."""
         node = self._index.get(order_id)

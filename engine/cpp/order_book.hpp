@@ -56,6 +56,8 @@ public:
     std::vector<std::tuple<i64, i64, i64>> depth(int side, std::size_t levels = 0) const;
     i64 volume(int side, std::size_t levels) const;
     i64 level_qty(int side, i64 price) const;
+    // (id, qty) of `owner`'s orders at a price, FIFO order
+    std::vector<std::pair<i64, i64>> owner_orders_at(int side, i64 price, i64 owner) const;
     // (quantity ahead, orders ahead) in the order's FIFO; nullopt if unknown id
     std::optional<std::pair<i64, i64>> queue_position(i64 id) const;
     struct OrderInfo { int side; i64 price, qty, owner; bool post_only; };

@@ -213,6 +213,15 @@ i64 OrderBook::level_qty(int side, i64 price) const {
     return it == side_map(side).end() ? 0 : it->second.total_qty;
 }
 
+std::vector<std::pair<i64, i64>> OrderBook::owner_orders_at(int side, i64 price, i64 owner) const {
+    std::vector<std::pair<i64, i64>> out;
+    auto it = side_map(side).find(side_key(side, price));
+    if (it == side_map(side).end()) return out;
+    for (const Order* o = it->second.head; o != nullptr; o = o->next)
+        if (o->owner == owner) out.emplace_back(o->id, o->qty);
+    return out;
+}
+
 std::optional<std::pair<i64, i64>> OrderBook::queue_position(i64 id) const {
     auto it = index_.find(id);
     if (it == index_.end()) return std::nullopt;

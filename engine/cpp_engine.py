@@ -170,6 +170,9 @@ class CppOrderBook:
     def level_qty(self, side: Side, price: int) -> int:
         return self._b.level_qty(int(side), price)
 
+    def owner_orders_at(self, side: Side, price: int, owner: int) -> list[tuple[int, int]]:
+        return self._b.owner_orders_at(int(side), price, owner)
+
     def queue_position(self, order_id: int) -> Optional[tuple[int, int]]:
         return self._b.queue_position(order_id)
 

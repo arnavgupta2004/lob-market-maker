@@ -358,3 +358,16 @@ def test_listener_receives_every_event():
 
 def test_queue_position_unknown_order():
     assert make().queue_position(5) is None
+
+
+def test_owner_orders_at_returns_only_that_owners_orders_in_fifo_order():
+    b = make()
+    b.submit_limit(1, B, 99, 3, owner=7)
+    b.submit_limit(2, B, 99, 4, owner=8)
+    b.submit_limit(3, B, 99, 5, owner=7)
+    b.submit_limit(4, B, 98, 1, owner=7)
+    assert b.owner_orders_at(B, 99, 7) == [(1, 3), (3, 5)]
+    assert b.owner_orders_at(B, 99, 8) == [(2, 4)]
+    assert b.owner_orders_at(B, 99, 9) == [] and b.owner_orders_at(B, 50, 7) == [] and b.owner_orders_at(S, 99, 7) == []
+    b.submit_market(9, S, 3)  # partial: order 1 (front) filled
+    assert b.owner_orders_at(B, 99, 7) == [(3, 5)]

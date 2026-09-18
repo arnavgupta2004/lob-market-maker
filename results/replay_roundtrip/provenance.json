@@ -1,0 +1,30 @@
+{
+  "command": "python -m experiments.run replay_roundtrip --seed 42 --workers 8",
+  "dataset": "synthetic feed exported from the simulator",
+  "elapsed_s": 0.7652931213378906,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "replay_roundtrip",
+  "git": {
+    "commit": "fa5f41feb7d0aff0401ab2f96c8718322f624b5b",
+    "dirty": true
+  },
+  "parameters": {
+    "horizon_s": 180.0,
+    "sessions": 8
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "roundtrip.csv": "2d4a5fd107560ea07e74d9e82ae03fd76dfd300c1b849585f033a32d5fe747c9"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789770836
+}

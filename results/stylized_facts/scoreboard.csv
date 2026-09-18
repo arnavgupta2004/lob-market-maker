@@ -1,0 +1,8 @@
+check,noise,noise_mean,informed,informed_mean,hawkes,hawkes_mean,hawkes+meta,hawkes+meta_mean
+heavy tails: excess kurtosis (1 s returns) > 0,True,10.626899677000086,True,5.77991172311882,True,6.205152853542971,True,5.112765210563084
+"vol clustering: ACF(|r|, lag 1 @1 s) > 0",True,0.12897642208783783,True,0.11878627954434597,True,0.12075432745543062,True,0.13575120040284677
+"vol clustering persists: ACF(|r|, lag 10 @1 s) > 0",False,-0.018576964023882453,False,0.0006719479492896599,False,0.00037251244789772474,False,-0.013140680971588168
+"persistent order signs: ACF(sign, lag 1) > 0",False,-0.0011340761316046368,True,0.04412863289350512,True,0.047828147568449976,True,0.04665784941397555
+"long memory: sign-ACF exponent in (0.1, 1)",False,-0.012552605941960176,True,0.31802279416722345,True,0.39335500906777493,True,0.4076232409161852
+arrival clustering: Fano(1 s) > 1.1,False,0.9738460732867573,False,1.0248453067712264,True,1.678941526890244,True,2.0237640059663438
+spread varies: 99th pct > median,True,4.0,True,6.0625,True,6.6875,True,6.3125

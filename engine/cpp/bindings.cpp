@@ -163,6 +163,7 @@ PYBIND11_MODULE(_lob_cpp, m) {
              py::arg("side"), py::arg("levels") = 0)
         .def("volume", &OrderBook::volume)
         .def("level_qty", &OrderBook::level_qty)
+        .def("owner_orders_at", &OrderBook::owner_orders_at)
         .def("num_levels", &OrderBook::num_levels)
         .def("queue_position", [](const OrderBook& b, i64 id) { return b.queue_position(id); })
         .def("order_info", [](const OrderBook& b, i64 id) -> py::object {

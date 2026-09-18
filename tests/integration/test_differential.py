@@ -116,6 +116,8 @@ def check_stepwise(cmds):
             assert oid in cpp
         if isinstance(c, NewLimit):
             assert py.level_qty(c.side, c.price) == cpp.level_qty(c.side, c.price)
+            for owner in (0, 1, 2, 3):
+                assert py.owner_orders_at(c.side, c.price, owner) == cpp.owner_orders_at(c.side, c.price, owner)
     assert py.events == cpp.events and py.seq == cpp.seq
     return py, cpp
 

@@ -1,0 +1,63 @@
+{
+  "command": "python -m experiments.run resilience --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 29.76958918571472,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "resilience",
+  "git": {
+    "commit": "fa5f41feb7d0aff0401ab2f96c8718322f624b5b",
+    "dirty": true
+  },
+  "parameters": {
+    "analysis": "paired (shock - no-shock control, same seeds) effect curves",
+    "envs": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "noise": {
+        "informed": null
+      }
+    },
+    "horizon_s": 600.0,
+    "sample_dt_s": 0.05,
+    "sessions": 24,
+    "shock_sizes": [
+      20,
+      60
+    ],
+    "shock_spacing_s": 30,
+    "window_s": 10.0
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "resilience.csv": "802edefbb549bb10dfe423d3793cdf5f31d450d2be8b56047c4820caf46996d2",
+    "resilience.png": "6e188b8bcbc956864a343dd10a0ee8e59f427296e5aad417c2f7c2d2ec834073",
+    "resilience_curves.csv": "356736e527cf2dbe6a9d8c7e81b2796f268fd2d7755577ba8165c0f1961c1bc2"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789770988
+}
