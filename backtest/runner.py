@@ -71,6 +71,12 @@ def run_session(sc: Scenario, seed: int, keep_result: bool = True) -> Session:
         metrics.update(killed=float(mm.killed), kill_time_s=(mm.kill_time or 0) / 1e9 if mm.killed else float("nan"),
                        sigma_hat_final=mm.sigma, n_sigma_clamped=float(mm.n_sigma_clamped),
                        n_offset_clamped=float(mm.n_offset_clamped))
+        # adverse selection of the maker's passive fills, measured directly (post-fill signed mid move, ticks per lot; <0 = adverse)
+        from research.adverse_selection import passive_fills, summarize_fills
+        af = summarize_fills(res, passive_fills(res, mm.owner_id))
+        metrics.update(eff_half_spread_ticks=af["E"], **{f"postfill_{k[2:]}": v for k, v in af.items() if k.startswith("M_")},
+                       **{f"realized_half_spread_{k[2:]}": v for k, v in af.items() if k.startswith("R_")})
+        metrics["adverse_cost_500ms"] = -af["M_500ms"]
         if hasattr(mm, "mean_components"):  # adaptive strategy: how large each component was, how often it acted
             metrics.update(mm.mean_components())
             metrics.update(n_kept_by_queue=float(mm.n_kept_by_queue), n_adverse_measured=float(mm.tracker.n_measured),

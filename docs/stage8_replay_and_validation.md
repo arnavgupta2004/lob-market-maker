@@ -1,9 +1,7 @@
 # Stage 8 - historical-data replay machinery and simulator validation
 
-**Scope and status.** No real dataset has been approved or downloaded, so this stage delivers (1) the replay interface and its
-proof of fidelity on a synthetic feed with known ground truth, (2) validated stylized-fact estimators and two richer flow models,
-and (3) the simulator's own stylized facts and book-resilience response. **The comparison of simulated versus *empirical* properties
-is not done** - it needs the dataset (see `data/README.md`). Nothing below is a calibration to a real asset.
+**Scope and status.** This document covers the replay interface and its proof of fidelity on a synthetic feed with known ground truth, the validated stylized-fact estimators and two richer flow models, and the simulator's own stylized facts and
+book-resilience response - all *simulator-side*. The real-data comparison (a recorded hour of Kraken BTC/USD replayed through the same engine and analysed with the same estimators) is in **`stage8b_real_data.md`**; where it changes a statement made here it is noted inline. Nothing below is a calibration to a real asset.
 
 ```bash
 python -m experiments.run replay_roundtrip --seed 42 --workers 8
@@ -64,7 +62,7 @@ clustering (Fano 1.02 -> 1.68 at 1 s, 2.2 at 10 s; inter-arrival CV 1.00 -> 1.07
   tick discreteness alone inflates it. The Hill index at 1 s is 3.0-3.4 at the top 5% but 3.7-4.6 at the top 1%, i.e. not a clean power law; I do not claim
   the "inverse cubic law".
 * *Volatility clustering is short-lived only.* ACF(|r|) is +0.13 at 1 s lag but ~0 by 10 s in every variant: no persistent clustering. The fundamental has
-  constant volatility and no mechanism couples volatility to activity. **This is the clearest realism gap and is not fixed.**
+  constant volatility and no mechanism couples volatility to activity. **Realism gap relative to the literature, not fixed; the one real hour (`stage8b_real_data.md`) did not establish it either (real ACF at a 10 s lag: +0.020 [-0.010, +0.049]).**
 * *Order-sign persistence is weak and its exponent is not well determined.* Lag-1 sign ACF is 0.04-0.05 (empirical values for liquid assets are
   reported to be considerably larger); the power-law fit has R^2 of only 0.25-0.34; 0.41 is below the alpha - 1 = 0.5 theory value, plausibly because
   metaorder children are only ~10% of aggressive orders (0.3 parents/s x ~9 children vs ~25 other market orders/s) - a hypothesis, not tested. The

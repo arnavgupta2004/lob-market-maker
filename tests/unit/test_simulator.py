@@ -212,3 +212,22 @@ def test_momentum_trader_uses_lookback_and_trades_with_the_trend():
     r = Simulator(SimConfig(seed=1, horizon_s=30), [NoiseTrader(), InformedTrader(cfg)]).run()
     mkts = [c for c in r.commands if isinstance(c, NewMarket) and c.owner == 2]
     assert len(mkts) > 50
+
+
+# ------------------------------------------------------------------------------ fundamental jumps
+def test_jumps_disabled_leave_the_path_bit_identical_and_enabled_adds_jump_variance():
+    base = FundamentalProcess(FundamentalConfig(sigma=0.03), 100.0, 60 * NS, rng(3))
+    same = FundamentalProcess(FundamentalConfig(sigma=0.03, jump_rate=0.0, jump_sigma=0.5), 100.0, 60 * NS, rng(3))
+    assert np.array_equal(base.path, same.path)  # rate 0: identical to the no-jump process (no extra RNG draws)
+    cfg = FundamentalConfig(sigma=0.01, jump_rate=1.0, jump_sigma=0.1)
+    ends = [FundamentalProcess(cfg, 100.0, 10 * NS, rng(i)).value_at(10 * NS) for i in range(500)]
+    # Var = sigma^2 T + rate T jump_sigma^2 = 1e-4*10 + 10*0.01 = 0.101
+    assert np.var(ends) == pytest.approx(0.101, rel=0.2)
+    steps = np.abs(np.diff(FundamentalProcess(cfg, 100.0, 200 * NS, rng(1)).path))
+    assert steps.max() > 0.15  # discrete jumps well above diffusive increments (0.001)
+
+
+def test_ou_with_jumps_still_mean_reverts():
+    cfg = FundamentalConfig(sigma=0.02, kappa=2.0, mu=100.0, jump_rate=0.5, jump_sigma=0.1)
+    x = FundamentalProcess(cfg, 100.0, 300 * NS, rng(2)).path[1000:]
+    assert abs(x.mean() - 100.0) < 0.15 and x.std() < 0.5

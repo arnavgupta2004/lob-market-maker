@@ -1,0 +1,19 @@
+{
+  "block_s": 300.0,
+  "blocks": 11,
+  "dataset": "Kraken public WebSocket API v2 (book depth 100 + trade); BTC/USD; raw kraken_BTCUSD_A.jsonl sha256=0c2227334d650118...; 3597 s; tick 0.1 lot 1e-08",
+  "exchange_checksum_checked": 262671,
+  "exchange_checksum_match_rate": 1.0,
+  "feed_events": 459568,
+  "feed_level_updates": 455523,
+  "feed_trades": 4044,
+  "reconnects": 0,
+  "replay_crossing_adds": 0,
+  "replay_touch_fidelity": 0.9979803479070257,
+  "replay_trade_price_mismatches": 0,
+  "span_s": 3596.946748,
+  "spread_ticks_mean": 1.1422891934721566,
+  "spread_ticks_median": 1.0,
+  "timestamp_inversions": 208,
+  "trade_rate_per_s": 1.1242868697593518
+}

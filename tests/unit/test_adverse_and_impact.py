@@ -127,3 +127,16 @@ def test_bin_stats_are_additive_and_table_reports_means():
 def test_no_positive_bins_gives_nan_fit():
     stats = {i: np.array([100, -5.0, 10.0, 100.0 * (i + 1)]) for i in range(4)}
     assert np.isnan(fit_power_law(stats)["alpha"])
+
+
+def test_merge_bursts_combines_same_instant_prints_into_one_parent_order():
+    from research.price_impact import AggressiveOrders, merge_bursts
+    ao = AggressiveOrders(t=np.array([5, 5, 5, 9, 9]), side=np.array([1.0, 1.0, 1.0, 1.0, -1.0]), qty=np.array([2.0, 3.0, 5.0, 4.0, 4.0]),
+                          mid_before=np.array([100.0, 100.5, 101.0, 100.0, 100.0]), vwap=np.array([101.0, 102.0, 103.0, 101.0, 99.0]),
+                          taker_owner=np.array([1, 1, 1, 1, 1]))
+    m = merge_bursts(ao)
+    assert m.t.tolist() == [5, 9, 9] and m.qty.tolist() == [10.0, 4.0, 4.0]
+    assert m.mid_before[0] == 100.0  # the first print's pre-trade mid
+    assert m.vwap[0] == pytest.approx((2 * 101 + 3 * 102 + 5 * 103) / 10)
+    assert sorted(m.side[1:].tolist()) == [-1.0, 1.0]  # opposite sides at the same instant stay separate
+    assert merge_bursts(AggressiveOrders(*[np.array([])] * 6)).t.size == 0

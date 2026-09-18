@@ -1,0 +1,158 @@
+{
+  "command": "python -m experiments.run sweep_market --seed 7 --workers 8 --out /tmp/mk7",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 27.07594084739685,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "sweep_market",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "axes": {
+      "flow_intensity_x": [
+        0.5,
+        1.0,
+        2.0
+      ],
+      "fundamental_sigma": [
+        0.01,
+        0.02,
+        0.03,
+        0.05,
+        0.08
+      ]
+    },
+    "calibration": {
+      "beta_obi": 0.6593816195571421,
+      "beta_obi_sd_across_sessions": 0.14720956175511754,
+      "fill_model": {
+        "b_d": -0.47897984420030304,
+        "b_q": -0.14940531241816224,
+        "horizon_s": 1.0,
+        "intercept": 1.0778903313808046
+      },
+      "k": 0.5517772316791014,
+      "k_ci": [
+        0.523403050776286,
+        0.5769933648037917
+      ],
+      "obi_horizon_s": 0.25
+    },
+    "note": "k, beta_obi, fill model measured once at default conditions and held fixed across the grid",
+    "sessions": 12,
+    "strategies": {
+      "AS": {
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "flatten_on_kill": true,
+        "gamma": 0.01,
+        "horizon_s": 5.0,
+        "inventory_limit": 50,
+        "k": 0.5517772316791014,
+        "kill_inventory": 100,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "modify_to_shrink": false,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "sigma": null,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "tau_mode": "restart",
+        "vol_halflife_s": 10.0
+      },
+      "adaptive": {
+        "adverse_alpha": 0.1,
+        "adverse_cap": 5.0,
+        "adverse_halflife_s": 30.0,
+        "adverse_horizon_s": 0.5,
+        "base_half_spread": null,
+        "beta_obi": 0.6593816195571421,
+        "beta_ret": 0.0,
+        "c_adverse": 1.0,
+        "c_latency": 1.0,
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "fill_model": {
+          "b_d": -0.47897984420030304,
+          "b_q": -0.14940531241816224,
+          "horizon_s": 1.0,
+          "intercept": 1.0778903313808046
+        },
+        "flatten_on_kill": true,
+        "inventory_limit": 50,
+        "k": 0.5517772316791014,
+        "kappa_size": 1.0,
+        "kill_inventory": 100,
+        "lambda_inv": 0.1,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "modify_to_shrink": true,
+        "obi_levels": 1,
+        "queue_eps": 0.0,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "ret_horizon_s": 1.0,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "use_adverse": true,
+        "use_inventory_size": true,
+        "use_inventory_skew": true,
+        "use_latency": true,
+        "use_obi": true,
+        "use_queue": true,
+        "use_returns": false,
+        "vol_halflife_s": 10.0
+      }
+    }
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "AS_heatmaps.png": "b3a9c0c29318fafcca46e69c1398630a3af5a523fae081e797c9713a385402c9",
+    "adaptive_heatmaps.png": "9865e7d12daa4bfae62c05407744709c60c675b918aa2edbfc7468d6fdb6912c",
+    "cells.csv": "a087a736834cb5eab4b6d59ef9911a275ec85d8cadef13e5f91c9ec343d1ee15",
+    "sessions.parquet": "5fc43f2c16593eb3c759a8fbcec3682bbd37a2113aef42b4f3299303a97848ef"
+  },
+  "seed": 7,
+  "session_seeds": {
+    "base": 700000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789774447
+}

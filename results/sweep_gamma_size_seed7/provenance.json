@@ -1,0 +1,142 @@
+{
+  "command": "python -m experiments.run sweep_gamma_size --seed 7 --workers 8 --out /tmp/sw7_sweep_gamma_size",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 22.64111590385437,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "sweep_gamma_size",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "axes": {
+      "gamma": [
+        0.0,
+        0.005,
+        0.01,
+        0.02,
+        0.05,
+        0.1
+      ],
+      "quote_size": [
+        1,
+        2,
+        5,
+        10,
+        20
+      ]
+    },
+    "base": {
+      "informed": {
+        "imbalance_levels": 3,
+        "imbalance_scale": 5.0,
+        "lookback_s": 1.0,
+        "max_size": 1000,
+        "rate": 10.0,
+        "signal_noise": 0.0,
+        "size": {
+          "median": 5.0,
+          "sigma": 0.8
+        },
+        "threshold": 1.0,
+        "w_imbalance": 0.0,
+        "w_momentum": 0.0,
+        "w_value": 1.0
+      },
+      "mm": {
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "flatten_on_kill": true,
+        "gamma": 0.01,
+        "horizon_s": 5.0,
+        "inventory_limit": 50,
+        "k": 0.5640251195993465,
+        "kill_inventory": 100,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "modify_to_shrink": false,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "sigma": null,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "tau_mode": "restart",
+        "vol_halflife_s": 10.0
+      },
+      "name": "sweep_informed",
+      "noise": {
+        "cancel_rate": 1.0,
+        "limit_rate": 50.0,
+        "market_rate": 15.0,
+        "market_size": {
+          "median": 5.0,
+          "sigma": 0.8
+        },
+        "max_size": 1000,
+        "offset": {
+          "scale": 3.0
+        },
+        "p_buy": 0.5,
+        "size": {
+          "median": 5.0,
+          "sigma": 0.8
+        }
+      },
+      "sim": {
+        "fundamental": {
+          "dt_s": 0.01,
+          "jump_rate": 0.0,
+          "jump_sigma": 0.0,
+          "kappa": 0.0,
+          "mu": null,
+          "sigma": 0.03
+        },
+        "horizon_s": 120.0,
+        "mid0_ticks": 10000,
+        "record_commands": true,
+        "record_events": true,
+        "sample_interval_s": 0.1,
+        "seed": 0,
+        "seed_gap_ticks": 1,
+        "seed_levels": 3,
+        "seed_size": 10,
+        "tick_size": 0.01,
+        "warmup_s": 5.0
+      }
+    },
+    "k": 0.5640251195993465,
+    "sessions": 12
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "cells.csv": "ff5f9ab2a1208c06a2dac8bac5b68e945e6127fc0c3680fe360d66b320ea1a57",
+    "heatmaps.png": "53690398f94cf79768d6893c87a667eda32e2df6df5efed99ed9faabaa786446",
+    "sessions.parquet": "0eb5caa258c50a82773f7747dcc8ed1853bf612506fd6c3c56c2a3bdf65af521"
+  },
+  "seed": 7,
+  "session_seeds": {
+    "base": 700000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789774773
+}

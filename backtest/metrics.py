@@ -126,6 +126,8 @@ def session_metrics(res: SimResult, owner: int, fees: FeeModel = FeeModel(), sta
     valid = ~np.isnan(legs.mid_before)
     edge_ticks = float(np.sum(legs.signed_qty[valid] * (legs.mid_before[valid] - legs.price[valid])))
     edge = edge_ticks * tick
+    notional = legs.price * tick * np.abs(legs.signed_qty)
+    out.update(notional_maker=float(notional[legs.is_maker].sum()), notional_taker=float(notional[~legs.is_maker].sum()))
     out.update(pnl_net=net, pnl_gross=gross, fees=fees_paid, pnl_edge=edge,
                pnl_inventory=gross - edge, pnl_realized=realized_pnl(legs, tick))
     out["pnl_unrealized"] = gross - out["pnl_realized"]
@@ -184,6 +186,8 @@ def session_metrics(res: SimResult, owner: int, fees: FeeModel = FeeModel(), sta
         quote_to_trade=(n_add + n_cancel + n_reject) / n_fills if n_fills else float("nan"),
         quote_lifetime_mean_s=float(np.mean(lifetimes)) if lifetimes else float("nan"),
         quote_lifetime_median_s=float(np.median(lifetimes)) if lifetimes else float("nan"),
+        quote_surv_250ms=float(np.mean(np.array(lifetimes) >= 0.25)) if lifetimes else float("nan"),
+        quote_surv_1s=float(np.mean(np.array(lifetimes) >= 1.0)) if lifetimes else float("nan"),
         avg_edge_ticks=edge_ticks / total_qty if total_qty else float("nan"),
         pnl_per_lot=net / total_qty if total_qty else float("nan"),
     )

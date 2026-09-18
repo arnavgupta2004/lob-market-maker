@@ -1,0 +1,83 @@
+{
+  "command": "python -m experiments.run real_data --seed 42",
+  "dataset": "Kraken public WebSocket API v2 (book depth 100 + trade); BTC/USD; raw kraken_BTCUSD_A.jsonl sha256=0c2227334d650118...; 3597 s; tick 0.1 lot 1e-08",
+  "elapsed_s": 5.158689737319946,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "real_data",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "block_s": 300.0,
+    "blocks": 11,
+    "markout_horizons": [
+      "100ms",
+      "500ms",
+      "1s",
+      "5s",
+      "10s"
+    ],
+    "obi_horizons": [
+      0.1,
+      0.5,
+      1.0,
+      5.0,
+      10.0
+    ],
+    "quality": {
+      "block_s": 300.0,
+      "blocks": 11,
+      "dataset": "Kraken public WebSocket API v2 (book depth 100 + trade); BTC/USD; raw kraken_BTCUSD_A.jsonl sha256=0c2227334d650118...; 3597 s; tick 0.1 lot 1e-08",
+      "exchange_checksum_checked": 262671,
+      "exchange_checksum_match_rate": 1.0,
+      "feed_events": 459568,
+      "feed_level_updates": 455523,
+      "feed_trades": 4044,
+      "reconnects": 0,
+      "replay_crossing_adds": 0,
+      "replay_touch_fidelity": 0.9979803479070257,
+      "replay_trade_price_mismatches": 0,
+      "span_s": 3596.946748,
+      "spread_ticks_mean": 1.1422891934721566,
+      "spread_ticks_median": 1.0,
+      "timestamp_inversions": 208,
+      "trade_rate_per_s": 1.1242868697593518
+    },
+    "size_edges_btc": [
+      0.0001,
+      0.0003,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.3,
+      1.0,
+      10000.0
+    ],
+    "uncertainty": "block bootstrap over consecutive blocks of one contiguous recording (optimistic: blocks are correlated)"
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "impact_fits.json": "5ed8f526e439d0dacaab34c759e66fca133fe58b1fedd36fea9d00cace99cbf9",
+    "impact_real.csv": "d7aa15b30bda8b6b07d798209b391edc2c593ca047f7433e68d00ef67d2c0a32",
+    "markouts_real.csv": "90bdb7bd5c6df9bf43043d646ab26133ba24c9d511a85a4a083aad1f3e388941",
+    "obi_bins_real.csv": "aa046512521d127c42e8f3ab31032049826ceabf5c57c662e4fac3a22c23c5ae",
+    "obi_real.csv": "4b59ca59da418d0ec3bcab7341967c5de71b2ee9218d7082b4ce60cfafd35ee2",
+    "quality.json": "1b2bd9e1a0765ad944d8b4c6e88a3e43b577865a5a9aecc2e85fc6b5bfaa74ff",
+    "real_data.png": "d1b19948b547a396f9dd0ffa15d2a118e03761f4841143304ac29ba9d8d9b0f0",
+    "stylized_real_vs_sim.csv": "0f78dd3eff8e18db48a7236ffb2de4e530ef80cf90a7e645d342896a245ba056"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789774977
+}

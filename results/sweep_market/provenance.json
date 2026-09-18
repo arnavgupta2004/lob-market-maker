@@ -1,0 +1,158 @@
+{
+  "command": "python -m experiments.run sweep_market --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 35.920127153396606,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "sweep_market",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "axes": {
+      "flow_intensity_x": [
+        0.5,
+        1.0,
+        2.0
+      ],
+      "fundamental_sigma": [
+        0.01,
+        0.02,
+        0.03,
+        0.05,
+        0.08
+      ]
+    },
+    "calibration": {
+      "beta_obi": 0.6256037025246269,
+      "beta_obi_sd_across_sessions": 0.12214512218343872,
+      "fill_model": {
+        "b_d": -0.5741449485088437,
+        "b_q": -0.1707362125468703,
+        "horizon_s": 1.0,
+        "intercept": 1.3131686600169725
+      },
+      "k": 0.5652427496657185,
+      "k_ci": [
+        0.5272370456855056,
+        0.5976059632599404
+      ],
+      "obi_horizon_s": 0.25
+    },
+    "note": "k, beta_obi, fill model measured once at default conditions and held fixed across the grid",
+    "sessions": 12,
+    "strategies": {
+      "AS": {
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "flatten_on_kill": true,
+        "gamma": 0.01,
+        "horizon_s": 5.0,
+        "inventory_limit": 50,
+        "k": 0.5652427496657185,
+        "kill_inventory": 100,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "modify_to_shrink": false,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "sigma": null,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "tau_mode": "restart",
+        "vol_halflife_s": 10.0
+      },
+      "adaptive": {
+        "adverse_alpha": 0.1,
+        "adverse_cap": 5.0,
+        "adverse_halflife_s": 30.0,
+        "adverse_horizon_s": 0.5,
+        "base_half_spread": null,
+        "beta_obi": 0.6256037025246269,
+        "beta_ret": 0.0,
+        "c_adverse": 1.0,
+        "c_latency": 1.0,
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "fill_model": {
+          "b_d": -0.5741449485088437,
+          "b_q": -0.1707362125468703,
+          "horizon_s": 1.0,
+          "intercept": 1.3131686600169725
+        },
+        "flatten_on_kill": true,
+        "inventory_limit": 50,
+        "k": 0.5652427496657185,
+        "kappa_size": 1.0,
+        "kill_inventory": 100,
+        "lambda_inv": 0.1,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "modify_to_shrink": true,
+        "obi_levels": 1,
+        "queue_eps": 0.0,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "ret_horizon_s": 1.0,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "use_adverse": true,
+        "use_inventory_size": true,
+        "use_inventory_skew": true,
+        "use_latency": true,
+        "use_obi": true,
+        "use_queue": true,
+        "use_returns": false,
+        "vol_halflife_s": 10.0
+      }
+    }
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "AS_heatmaps.png": "33abd463aac0c524f5e520743dac53495a06bd9067fa407bd85380b329597288",
+    "adaptive_heatmaps.png": "f8f3b8afaf26136b532cef9f041b69f59ace13ea9bab5fae6b151b79262800dc",
+    "cells.csv": "44e74164e1ef44533a74ae8ad5d1ea08adfa4bc771ab0aaad83c7a4adfe40530",
+    "sessions.parquet": "084292b3e85d392bace63633d26ff4770f7c8fc60d79bc69951d1ad768e02412"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789772866
+}

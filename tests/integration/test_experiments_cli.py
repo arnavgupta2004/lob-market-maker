@@ -8,6 +8,10 @@ from experiments.run import REGISTRY, main
 
 @pytest.mark.parametrize("name", sorted(REGISTRY))
 def test_experiment_quick_run_writes_results_and_provenance(name, tmp_path):
+    if name in ("real_data", "real_mm"):
+        from pathlib import Path
+        if not Path("data/processed/kraken_BTCUSD_A.parquet").exists():
+            pytest.skip("real dataset not present (data/ is git-ignored: run data/collect_kraken.py and data/prepare_kraken.py)")
     if name in ("benchmark_engine", "benchmark_complexity"):
         from engine import cpp_engine
         if not cpp_engine.available():

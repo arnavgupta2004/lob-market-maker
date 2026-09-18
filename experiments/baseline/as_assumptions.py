@@ -38,10 +38,21 @@ DESCRIPTION = "Estimate A, k of the fill-intensity curve and test AS assumptions
 
 DWELL_S = 0.5
 DELTAS = (0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8)
-ENVS = {
+DEFAULT_FUNDAMENTAL = FundamentalConfig(sigma=0.03)
+ENVS = {  # the two original environments; every Stage 4-8 experiment iterates over exactly these
     "noise": dict(informed=None),
     "informed": dict(informed=InformedTraderConfig(rate=10.0)),
 }
+# Environments including the jump/news stress case, used only by the Stage 9 experiments that ask for it (latency, ablation, sweeps).
+# Its parameters (jumps of ~5 ticks std every ~5 s on top of the diffusion) were not tuned to any result. Kept separate from ENVS so
+# that earlier experiments neither change nor break when it is added.
+ALL_ENVS = {**ENVS, "informed_jump": dict(informed=InformedTraderConfig(rate=10.0),
+                                          fundamental=FundamentalConfig(sigma=0.03, jump_rate=0.2, jump_sigma=0.05))}
+
+
+def env_fundamental(env: str) -> FundamentalConfig:
+    """Latent-value process of a named environment."""
+    return ALL_ENVS[env].get("fundamental", DEFAULT_FUNDAMENTAL)
 LAGS = (1, 2, 5, 10, 50)
 
 
@@ -54,11 +65,10 @@ class CalibArgs:
 
 def probe_session(a: CalibArgs) -> dict:
     """One session: noise (+informed) flow with a passive probe. Picklable, top-level."""
-    cfg = SimConfig(seed=a.seed, horizon_s=a.horizon_s, fundamental=FundamentalConfig(sigma=0.03),
-                    sample_interval_s=0.1)
+    cfg = SimConfig(seed=a.seed, horizon_s=a.horizon_s, fundamental=env_fundamental(a.env), sample_interval_s=0.1)
     parts = [NoiseTrader(NoiseTraderConfig())]
-    if ENVS[a.env]["informed"] is not None:
-        parts.append(InformedTrader(ENVS[a.env]["informed"]))
+    if ALL_ENVS[a.env]["informed"] is not None:
+        parts.append(InformedTrader(ALL_ENVS[a.env]["informed"]))
     probe = ProbeQuoter(deltas=DELTAS, dwell_s=DWELL_S, start_s=cfg.warmup_s)
     res = Simulator(cfg, parts + [probe]).run()
     s, _ = res.steady()

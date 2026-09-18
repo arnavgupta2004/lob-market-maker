@@ -119,3 +119,9 @@ def pmap(fn, args: list, workers: int) -> list:
         with ProcessPoolExecutor(max_workers=workers) as ex:
             return list(ex.map(fn, args))
     return [fn(a) for a in args]
+
+
+def save_parquet(path: Path, rows: list[dict]) -> None:
+    """Rows -> Parquet (columns keep their numeric types)."""
+    import pandas as pd
+    pd.DataFrame(rows).to_parquet(path, index=False)

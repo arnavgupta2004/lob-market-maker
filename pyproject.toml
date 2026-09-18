@@ -25,6 +25,8 @@ dev = [
     "ninja",
 ]
 
+data = ["websockets>=12"]  # only needed to record a live feed with data/collect_kraken.py
+
 [tool.setuptools.packages.find]
 include = ["engine*", "simulator*", "strategies*", "research*", "backtest*", "experiments*", "benchmarks*"]
 

@@ -1,0 +1,71 @@
+{
+  "command": "python -m experiments.run real_mm --seed 42",
+  "dataset": "Kraken public WebSocket API v2 (book depth 100 + trade); BTC/USD; raw kraken_BTCUSD_A.jsonl sha256=0c2227334d650118...; 3597 s; tick 0.1 lot 1e-08",
+  "elapsed_s": 31.229240894317627,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "real_mm",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "arms": [
+      "AS_scaled",
+      "adaptive_off",
+      "adaptive_inventory",
+      "adaptive_full"
+    ],
+    "calibration": {
+      "A": 0.05502896182634322,
+      "beta_obi": 1.8632567117744963,
+      "fill_model": {
+        "b_d": -0.32310108927270154,
+        "b_q": -0.031064477364392655,
+        "horizon_s": 1.0,
+        "intercept": -2.313190307481057
+      },
+      "k": 0.030420991828208264,
+      "k_r2": 0.8869372470999853,
+      "n_probes": 4450,
+      "sigma_ticks_per_sqrt_s": 13.039937653331021
+    },
+    "calibration_s": 900.0,
+    "fees_bps(maker,taker)": {
+      "A_0bps": [
+        0.0,
+        0.0
+      ],
+      "B_1/2.5bps": [
+        1.0,
+        2.5
+      ]
+    },
+    "inventory_limit_lots": 1000000,
+    "latencies_ms": [
+      0.0,
+      10.0
+    ],
+    "quote_lots": 100000,
+    "window_s": 300.0,
+    "windows": 8
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "calibration.json": "12702a6a1be23715ffa00488deceabb6a188981415682f7f7bb728c9813b8275",
+    "paired_differences.csv": "8def9526d855469f3064def2c4f0fe79ff3eb2206301ba234a7b9be4532126b0",
+    "real_mm.png": "5652321a85a4dc4dc9879083c76af45b10f25614805bdfcfacb2874668482989",
+    "summary.csv": "007050ffc43045f58bd1a4c8b2913a5f5afd6e25255786106112ad4a26bf4658",
+    "windows.csv": "d760301ec6a3f55b732b6d64358531ece8c6fe83413435056c9b4f88c56ad985"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789775031
+}

@@ -142,3 +142,59 @@ def summarize_session(res: SimResult, horizons_s: Sequence[float] = (0.1, 1.0), 
     qty = tp["qty"][m][first]
     out["trade_qty"] = {**moments(qty), "hill_5pct": hill_tail_index(qty, frac=0.05)["alpha"]}
     return out
+
+
+def summarize_window(res: SimResult, t0_ns: int, t1_ns: int, horizons_s: Sequence[float] = (0.1, 1.0), sign_lags: int = 50,
+                     acf_lags: int = 30, fano_windows_s: Sequence[float] = (1.0, 10.0), merge_bursts: bool = False) -> dict:
+    """Stylized-fact statistics of the time window ``[t0_ns, t1_ns)`` of one run - the block estimator used on real data
+    (one contiguous recording = one run; blocks play the role of sessions). Same definitions as ``summarize_session``.
+
+    ``merge_bursts``: treat prints sharing a timestamp and aggressor side as ONE parent order (needed for feeds that publish one trade per
+    fill: a single order sweeping several levels would otherwise inflate order-sign autocorrelation, arrival clustering and size statistics)."""
+    out: dict = {}
+    for h in horizons_s:
+        t = np.arange(t0_ns, t1_ns + 1, int(h * NS))
+        r = log_returns(mid_at(res, t))
+        mo = moments(r)
+        lab = f"{h:g}s"
+        out[f"kurt_{lab}"] = mo["excess_kurtosis"]
+        out[f"zero_share_{lab}"] = float(np.mean(r == 0))
+        out[f"hill5_{lab}"] = hill_tail_index(r, frac=0.05)["alpha"]
+        out[f"hill1_{lab}"] = hill_tail_index(r, frac=0.01)["alpha"]
+        nl = min(acf_lags, max(len(r) // 4, 2))
+        a_abs, a_ret = acf(np.abs(r), nl), acf(r, min(3, nl))
+        out[f"acf_ret1_{lab}"] = float(a_ret[0])
+        out[f"acf_abs1_{lab}"] = float(a_abs[0])
+        out[f"acf_abs10_{lab}"] = float(a_abs[9]) if nl >= 10 else float("nan")
+        out[f"_acf_abs_{lab}"] = a_abs.tolist()
+        out[f"n_returns_{lab}"] = int(len(r))
+    tp = res.trades
+    m = (tp["t_ns"] >= t0_ns) & (tp["t_ns"] < t1_ns)
+    if m.sum() < 30:
+        return out
+    ids = tp["taker_id"][m]
+    if merge_bursts:
+        tt, ss = tp["t_ns"][m], tp["aggressor"][m]
+        first = np.r_[True, (tt[1:] != tt[:-1]) | (ss[1:] != ss[:-1])]
+        group = np.cumsum(first) - 1
+        parent_qty = np.bincount(group, weights=tp["qty"][m].astype(float))
+    else:
+        first = np.r_[True, ids[1:] != ids[:-1]]
+        parent_qty = tp["qty"][m][first].astype(float)
+    sg = tp["aggressor"][m][first].astype(float)
+    arr = tp["t_ns"][m][first]
+    sacf = acf(sg, min(sign_lags, max(len(sg) // 4, 2)))
+    fit = power_law_exponent(sacf, lo=1, hi=len(sacf))
+    out.update(sign_acf1=float(sacf[0]), sign_gamma=fit["gamma"], sign_r2=fit["r2"], _sign_acf=sacf.tolist(), n_aggressive=int(len(arr)),
+               trade_rate_per_s=float(len(arr) / ((t1_ns - t0_ns) / NS)))
+    for w in fano_windows_s:
+        out[f"fano_{w:g}s"] = fano_factor(arr, w, t0_ns, t1_ns)
+    gaps = np.diff(arr.astype(float)); gaps = gaps[gaps > 0]
+    out["arrival_cv"] = float(gaps.std() / gaps.mean()) if len(gaps) > 5 else float("nan")
+    ms = (res.samples["t_ns"] >= t0_ns) & (res.samples["t_ns"] < t1_ns)
+    sp = res.samples["spread"][ms]
+    if np.isfinite(sp).any():
+        st = spread_stats(sp)
+        out.update(spread_mean=st["mean"], spread_median=st["median"], spread_q99=st["q99"])
+    out["size_hill5"] = hill_tail_index(parent_qty, frac=0.05)["alpha"]
+    return out

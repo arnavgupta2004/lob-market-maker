@@ -1,8 +1,9 @@
 # Data
 
-**No external dataset is bundled or has been downloaded.** Stage 8 built and validated the replay machinery on a *synthetic*
-feed with known ground truth (`experiments.validation.replay_roundtrip`); a real dataset requires an explicit decision on source,
-symbol, date range and licence, and a download that is approved beforehand.
+**No data is committed** (raw and processed files are git-ignored; the licence/terms of the source were not verified, so nothing is redistributed).
+The replay machinery was first validated on a *synthetic* feed with known ground truth (`experiments.validation.replay_roundtrip`) and then run on one recorded hour of
+Kraken BTC/USD L2 + trades: source, window, SHA-256, fields, timestamp resolution, integrity results and preprocessing are documented in `docs/stage8b_real_data.md`. Recreate it with
+`python data/collect_kraken.py --seconds 3600 --out data/raw/kraken_BTCUSD_A.jsonl` then `python data/prepare_kraken.py` (a live recording is not bit-reproducible; the analysis of a given file is).
 
 ## Normalised format (`simulator/order_flow/market_data.py`)
 
@@ -36,5 +37,5 @@ and the SHA-256 of the raw files. `experiments.common.write_provenance(dataset=.
 ## Loaders
 
 `simulator/order_flow/loaders.py` has config-driven CSV loaders (`Layout`) with presets for a vendor L2-incremental + trades layout and an
-exchange aggregate-trades layout. **The presets follow public documentation as I understand it and are tested only against hand-written
-fixtures - they have not been run on real files.** Use `describe_file` to check a real file's layout first and adjust the `Layout`.
+exchange aggregate-trades layout. The vendor-CSV presets (Tardis-style L2/trades, exchange aggregate trades) follow public documentation as I understand it and are tested only against hand-written fixtures;
+they have **not** been run on real files. The **Kraken v2 JSONL loader (`load_kraken_jsonl`) is the one exercised on real data** (schema observed live; checksum-verified). Use `describe_file` to check a real file's layout first.

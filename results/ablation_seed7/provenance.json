@@ -1,0 +1,287 @@
+{
+  "command": "python -m experiments.run ablation --seed 7 --workers 8 --out /tmp/abl7",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 100.62856316566467,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "ablation",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "arms": [
+      "L0_symmetric",
+      "L1_inventory",
+      "L2_obi",
+      "L3_adverse",
+      "L4_queue",
+      "L5_latency(full)",
+      "full-inventory",
+      "full-obi",
+      "full-adverse",
+      "full-queue",
+      "full-latency",
+      "AS_gamma0.01"
+    ],
+    "calibration": {
+      "informed": {
+        "beta_obi": 0.6593816195571421,
+        "beta_obi_sd_across_sessions": 0.14720956175511754,
+        "fill_model": {
+          "b_d": -0.47897984420030304,
+          "b_q": -0.14940531241816224,
+          "horizon_s": 1.0,
+          "intercept": 1.0778903313808046
+        },
+        "k": 0.5517772316791014,
+        "k_ci": [
+          0.523403050776286,
+          0.5769933648037917
+        ],
+        "obi_horizon_s": 0.25
+      },
+      "informed_jump": {
+        "beta_obi": 0.6515562073980181,
+        "beta_obi_sd_across_sessions": 0.08748329999630411,
+        "fill_model": {
+          "b_d": -0.4986187769056507,
+          "b_q": -0.1728766749033886,
+          "horizon_s": 1.0,
+          "intercept": 1.2479599586449348
+        },
+        "k": 0.534817464352219,
+        "k_ci": [
+          0.5119398880277687,
+          0.5584107679952667
+        ],
+        "obi_horizon_s": 0.25
+      },
+      "noise": {
+        "beta_obi": 0.43601821198508484,
+        "beta_obi_sd_across_sessions": 0.06959361193053318,
+        "fill_model": {
+          "b_d": -1.2060071893991762,
+          "b_q": -0.21183644397590246,
+          "horizon_s": 1.0,
+          "intercept": 1.6068368776074944
+        },
+        "k": 0.893709252387908,
+        "k_ci": [
+          0.8107925981509556,
+          1.0153345440127854
+        ],
+        "obi_horizon_s": 0.25
+      }
+    },
+    "calibration_seeds": [
+      750000,
+      750001,
+      750002,
+      750003,
+      750004,
+      750005,
+      750006,
+      750007,
+      750008,
+      750009,
+      750010,
+      750011
+    ],
+    "environments": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "informed_jump": {
+        "fundamental": {
+          "dt_s": 0.01,
+          "jump_rate": 0.2,
+          "jump_sigma": 0.05,
+          "kappa": 0.0,
+          "mu": null,
+          "sigma": 0.03
+        },
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "noise": {
+        "informed": null
+      }
+    },
+    "fees_bps(maker,taker)": {
+      "A_0bps": [
+        0.0,
+        0.0
+      ],
+      "B_0.5/2bps": [
+        0.5,
+        2.0
+      ],
+      "C_1/4bps": [
+        1.0,
+        4.0
+      ]
+    },
+    "horizon_s": 180.0,
+    "ladder": [
+      [
+        "L0_symmetric",
+        {}
+      ],
+      [
+        "L1_inventory",
+        {
+          "use_inventory_size": true,
+          "use_inventory_skew": true
+        }
+      ],
+      [
+        "L2_obi",
+        {
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_obi": true
+        }
+      ],
+      [
+        "L3_adverse",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_obi": true
+        }
+      ],
+      [
+        "L4_queue",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_obi": true,
+          "use_queue": true
+        }
+      ],
+      [
+        "L5_latency(full)",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_latency": true,
+          "use_obi": true,
+          "use_queue": true
+        }
+      ]
+    ],
+    "latency_ms_one_way": 10.0,
+    "leave_one_out": [
+      [
+        "full-inventory",
+        {
+          "use_adverse": true,
+          "use_inventory_size": false,
+          "use_inventory_skew": false,
+          "use_latency": true,
+          "use_obi": true,
+          "use_queue": true
+        }
+      ],
+      [
+        "full-obi",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_latency": true,
+          "use_obi": false,
+          "use_queue": true
+        }
+      ],
+      [
+        "full-adverse",
+        {
+          "use_adverse": false,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_latency": true,
+          "use_obi": true,
+          "use_queue": true
+        }
+      ],
+      [
+        "full-queue",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_latency": true,
+          "use_obi": true,
+          "use_queue": false
+        }
+      ],
+      [
+        "full-latency",
+        {
+          "use_adverse": true,
+          "use_inventory_size": true,
+          "use_inventory_skew": true,
+          "use_latency": false,
+          "use_obi": true,
+          "use_queue": true
+        }
+      ]
+    ],
+    "multiplicity": "Holm over 15 ladder comparisons on net P&L (regime B)",
+    "primary": "B_0.5/2bps",
+    "sessions": 40
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "ablation.png": "b7e4edcccc065f7790b913d6da5fd85b48feac70a9cc38c1255b470c7b621c07",
+    "calibration.json": "89b91bc48b1e9ba28a5715194dbec530309c1b9b48f2f7148dfd1fd49454e6d9",
+    "cumulative.csv": "71645c63700d19f75d36653fe3bc8d7f9c036987839a74b39d43cabebc64ac05",
+    "incremental.csv": "a99b93f4c9fb1c63d3c8c39bf449c6e1243a24eeb7081d3898279cd43af5d509",
+    "leave_one_out.csv": "5daf09d25719b00a9251be4ed6edd4b57edef70ff70d4b81ba6a3c2848950e3a",
+    "sessions.parquet": "65e41d883fc43af77c39ba2a48f0705ec3f4c51bebb04072e00fa2482daeb40a"
+  },
+  "seed": 7,
+  "session_seeds": {
+    "base": 700000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789774251
+}

@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from experiments.baseline.as_assumptions import ENVS, calibrate
+from experiments.baseline.as_assumptions import ALL_ENVS as ENVS, calibrate, env_fundamental
 from experiments.common import pmap
 from research.imbalance import session_stats
 from research.queue_position import FillModel, QueueProbe, fit_fill_model
@@ -37,14 +37,14 @@ def _parts(env: str):
 
 
 def _obi_slope(job: Job) -> float:
-    cfg = SimConfig(seed=job.seed, horizon_s=job.horizon_s, sample_interval_s=0.01, fundamental=FundamentalConfig(sigma=0.03),
+    cfg = SimConfig(seed=job.seed, horizon_s=job.horizon_s, sample_interval_s=0.01, fundamental=env_fundamental(job.env),
                     record_events=False, record_commands=False)
     res = Simulator(cfg, _parts(job.env)).run()
     return session_stats(res.samples, 0.01, [OBI_HORIZON_S], levels=1)[OBI_HORIZON_S]["slope"]
 
 
 def _probe_dataset(job: Job) -> dict:
-    cfg = SimConfig(seed=job.seed, horizon_s=job.horizon_s, fundamental=FundamentalConfig(sigma=0.03), record_events=False,
+    cfg = SimConfig(seed=job.seed, horizon_s=job.horizon_s, fundamental=env_fundamental(job.env), record_events=False,
                     record_commands=False)
     probe = QueueProbe(dwell_s=3.0)
     Simulator(cfg, _parts(job.env) + [probe]).run()

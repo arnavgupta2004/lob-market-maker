@@ -1,9 +1,9 @@
 """Loaders that turn public market-data files into the normalised array of ``simulator.order_flow.market_data``.
 
-**Status: the column layouts below follow the vendors' public documentation as I understand it and are exercised only by
-hand-written fixtures (``tests/unit/test_loaders.py``). They have NOT been run against real files. On first use with real
-data, check the layout with ``describe_file`` and adjust the ``Layout`` (column names / timestamp unit / side vocabulary) -
-every assumption is a field, not code.**
+**Status.** The Kraken v2 JSONL loader (``load_kraken_jsonl``, bottom of this file) has been run on a real one-hour recording and is verified against the exchange's own book
+checksum. The vendor-CSV layouts below (Tardis-style L2/trades, exchange aggregate trades) follow the vendors' public documentation as I understand it and are exercised only by
+hand-written fixtures (``tests/unit/test_loaders.py``); they have NOT been run on real files. On first use with real data, check the layout with ``describe_file`` and adjust the
+``Layout`` (column names / timestamp unit / side vocabulary) - every assumption is a field, not code.
 
 Ordering convention when a trade print and level updates share a timestamp: the TRADE comes first (a print precedes the level
 update it causes); the sort is stable so intra-message order is preserved.
@@ -114,3 +114,124 @@ def drop_crossed_and_dedupe(arr: np.ndarray) -> np.ndarray:
         elif k == int(MD.RESET):
             last.clear()
     return arr[keep]
+
+
+# ------------------------------------------------------------------------------------------------------------ Kraken v2 (raw JSONL)
+import json as _json
+import zlib as _zlib
+from datetime import datetime, timezone
+
+
+def _iso_ns(ts: str) -> int:
+    """RFC 3339 timestamp with up to 9 fractional digits -> integer ns since the epoch."""
+    ts = ts.rstrip("Z")
+    main, _, frac = ts.partition(".")
+    base = int(datetime.strptime(main, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp())
+    return base * 1_000_000_000 + int((frac + "000000000")[:9])
+
+
+def kraken_checksum(bids: dict[float, float], asks: dict[float, float], price_decimals: int, qty_decimals: int) -> int:
+    """Kraken's book checksum: CRC32 of the top 10 asks (ascending) then top 10 bids (descending), each level rendered as
+    price and quantity with the decimal point and leading zeros removed (per the public v2 documentation)."""
+    def fmt(x: float, d: int) -> str:
+        return f"{x:.{d}f}".replace(".", "").lstrip("0") or "0"
+    a = sorted(asks)[:10]
+    b = sorted(bids, reverse=True)[:10]
+    s = "".join(fmt(p, price_decimals) + fmt(asks[p], qty_decimals) for p in a) + "".join(fmt(p, price_decimals) + fmt(bids[p], qty_decimals) for p in b)
+    return _zlib.crc32(s.encode()) & 0xFFFFFFFF
+
+
+def load_kraken_jsonl(path: str | Path, tick_size: float, lot_size: float, price_decimals: int = 1, qty_decimals: int = 8,
+                      depth: Optional[int] = None, verify_checksum: bool = True) -> tuple[np.ndarray, dict]:
+    """Raw Kraken WebSocket v2 recording (``data/collect_kraken.py``) -> normalised events + a data-quality report.
+
+    * book ``snapshot`` -> ``RESET`` + one ``LEVEL`` per level; ``update`` -> ``LEVEL`` events (absolute quantities, 0 removes);
+    * ``trade`` -> ``TRADE`` (Kraken's ``side`` is the aggressor); a collector reconnect -> ``RESET``;
+    * timestamps: the exchange timestamp of each message (microsecond resolution as published); a snapshot has none, so the local
+      receive time is used (and forced non-decreasing);
+    * ``depth``: if set, the reconstructed book is truncated to the best ``depth`` levels per side after each update (the exchange
+      maintains a depth-limited book); levels pushed out are emitted as removals so the replay book stays consistent;
+    * if ``verify_checksum``: after each update the CRC32 of the reconstructed top-10 is compared with the exchange's checksum -
+      the report gives the match rate, i.e. an independent test that the reconstruction equals the exchange's book.
+    """
+    bids: dict[float, float] = {}
+    asks: dict[float, float] = {}
+    rows: list[tuple[int, int, int, int, int]] = []
+    rep = {"messages": 0, "bad_lines": 0, "snapshots": 0, "updates": 0, "trades": 0, "reconnects": 0, "checksum_checked": 0, "checksum_ok": 0,
+           "max_levels_bid": 0, "max_levels_ask": 0, "truncated_levels_emitted": 0, "ts_inversions": 0, "first_ts_ns": None, "last_ts_ns": None}
+    last_ts = 0
+    RES, LVL, TRD = int(MD.RESET), int(MD.LEVEL), int(MD.TRADE)
+
+    def ticks(p: float) -> int:
+        return int(round(p / tick_size))
+
+    def lots(q: float) -> int:
+        n = int(round(q / lot_size))
+        return 1 if (q > 0 and n == 0) else n
+
+    def emit_level(ts: int, side: int, p: float, q: float) -> None:
+        rows.append((ts, LVL, side, ticks(p), lots(q) if q > 0 else 0))
+
+    with open(path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            try:
+                rec = _json.loads(line)
+            except ValueError:
+                rep["bad_lines"] += 1  # e.g. the last line of a file still being written
+                continue
+            msg, recv = rec["msg"], rec["recv_ns"]
+            ch, typ = msg.get("channel"), msg.get("type")
+            if ch == "_collector":
+                rep["reconnects"] += 1
+                bids.clear(); asks.clear()
+                rows.append((max(last_ts, recv), RES, 0, 0, 0))
+                continue
+            if ch not in ("book", "trade") or typ not in ("snapshot", "update"):
+                continue
+            rep["messages"] += 1
+            for d in msg.get("data", []):
+                ts = _iso_ns(d["timestamp"]) if d.get("timestamp") else recv
+                if ts < last_ts:
+                    rep["ts_inversions"] += 1
+                    ts = last_ts  # forced non-decreasing; inversions are counted in the report
+                last_ts = ts
+                if rep["first_ts_ns"] is None:
+                    rep["first_ts_ns"] = ts
+                rep["last_ts_ns"] = ts
+                if ch == "trade":
+                    rep["trades"] += 1
+                    rows.append((ts, TRD, 1 if d["side"] == "buy" else -1, ticks(d["price"]), max(lots(d["qty"]), 1)))
+                    continue
+                if typ == "snapshot":
+                    rep["snapshots"] += 1
+                    bids.clear(); asks.clear()
+                    rows.append((ts, RES, 0, 0, 0))
+                else:
+                    rep["updates"] += 1
+                for side, book, key in ((1, bids, "bids"), (-1, asks, "asks")):
+                    for lv in d.get(key, []):
+                        p, q = lv["price"], lv["qty"]
+                        if q > 0:
+                            book[p] = q
+                        else:
+                            book.pop(p, None)
+                        emit_level(ts, side, p, q)
+                if depth is not None:
+                    for side, book, worst in ((1, bids, lambda b: sorted(b)[:-depth]), (-1, asks, lambda a: sorted(a, reverse=True)[:-depth])):
+                        if len(book) > depth:
+                            for p in worst(book):
+                                book.pop(p)
+                                emit_level(ts, side, p, 0.0)
+                                rep["truncated_levels_emitted"] += 1
+                rep["max_levels_bid"] = max(rep["max_levels_bid"], len(bids))
+                rep["max_levels_ask"] = max(rep["max_levels_ask"], len(asks))
+                if verify_checksum and d.get("checksum") is not None and bids and asks:
+                    rep["checksum_checked"] += 1
+                    rep["checksum_ok"] += int(kraken_checksum(bids, asks, price_decimals, qty_decimals) == d["checksum"])
+    arr = np.array(rows, dtype=np.int64).reshape(-1, 5)
+    if len(arr):  # at equal time: trades first (a print precedes the level update it causes); everything else keeps STREAM order
+        prio = np.where(arr[:, 1] == TRD, 0, 1)  # (a snapshot's RESET precedes its levels in the stream; a reconnect's RESET follows the updates it voids)
+        arr = arr[np.lexsort((np.arange(len(arr)), prio, arr[:, 0]))]
+    rep["checksum_match_rate"] = rep["checksum_ok"] / rep["checksum_checked"] if rep["checksum_checked"] else float("nan")
+    rep["span_s"] = (rep["last_ts_ns"] - rep["first_ts_ns"]) / 1e9 if rep["first_ts_ns"] else 0.0
+    return arr, rep

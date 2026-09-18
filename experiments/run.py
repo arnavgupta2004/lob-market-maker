@@ -30,9 +30,33 @@ REGISTRY = {
     "resilience": "experiments.validation.resilience",
     "replay_roundtrip": "experiments.validation.replay_roundtrip",
     "adaptive_demo": "experiments.ablations.adaptive_demo",
+    "real_data": "experiments.real_data.real_data",
+    "real_mm": "experiments.real_data.real_mm",
+    "latency": "experiments.latency.latency_sweep",
+    "ablation": "experiments.ablations.ladder",
+    "sweep_gamma_size": "experiments.parameter_sweeps.sweeps:sweep_gamma_size",
+    "sweep_gamma_latency": "experiments.parameter_sweeps.sweeps:sweep_gamma_latency",
+    "sweep_inventory": "experiments.parameter_sweeps.sweeps:sweep_inventory",
+    "sweep_market": "experiments.parameter_sweeps.sweeps:sweep_market",
+    "sweep_adaptive": "experiments.parameter_sweeps.sweeps:sweep_adaptive",
+    "sweep_spread": "experiments.parameter_sweeps.sweeps:sweep_spread",
     "benchmark_engine": "benchmarks.engine_benchmark",
     "benchmark_complexity": "benchmarks.complexity",
 }
+
+
+def _resolve(name: str):
+    """Registry value ``"pkg.mod"`` (module with ``run(ctx)``) or ``"pkg.mod:func"`` (function ``func(ctx)``)."""
+    target = REGISTRY[name]
+    mod, _, attr = target.partition(":")
+    m = importlib.import_module(mod)
+    return getattr(m, attr) if attr else m.run
+
+
+def _describe(name: str) -> str:
+    mod = importlib.import_module(REGISTRY[name].partition(":")[0])
+    d = getattr(mod, "DESCRIPTIONS", None)
+    return d[name] if d and name in d else getattr(mod, "DESCRIPTION", "")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -48,8 +72,8 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if args.list or not args.name:
-        for k, mod in REGISTRY.items():
-            print(f"{k:18s} {importlib.import_module(mod).DESCRIPTION}")
+        for k in REGISTRY:
+            print(f"{k:18s} {_describe(k)}")
         return 0
     if args.name not in REGISTRY:
         print(f"unknown experiment {args.name!r}; try --list", file=sys.stderr)
@@ -58,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     ctx = RunContext(args.name, args.seed, args.sessions, args.workers, args.quick, out_dir)
     t0 = time.time()
-    importlib.import_module(REGISTRY[args.name]).run(ctx)
+    _resolve(args.name)(ctx)
     print(f"[{args.name}] done in {time.time() - t0:.1f}s -> {out_dir}")
     return 0
 

@@ -93,3 +93,25 @@ def test_fano_factor_poisson_clustered_regular():
 def test_spread_stats_fields():
     s = spread_stats(np.array([1, 1, 1, 2, 2, 3, 1, 1, np.nan]))
     assert s["median"] == 1 and s["frac_at_min"] == pytest.approx(5 / 8) and s["q99"] >= s["q90"]
+
+
+def test_summarize_window_merges_bursts_into_parent_orders():
+    """A sweep printed as several same-instant fills must count as ONE order for sign / arrival / size statistics."""
+    from engine.commands import NewLimit, NewMarket
+    from engine.common import Side
+    from research.stylized_facts import summarize_window
+    from simulator.simulator import SimConfig, Simulator
+    from tests.helpers import Scripted
+    # book with 1-lot orders at 10 levels; a "sweep" = 3 separate market orders at the same instant (as a per-fill feed replays them)
+    asks = [(0, NewLimit(10**6 + i, Side.SELL, 200 + i, 1000, owner=1)) for i in range(5)]
+    bids = [(0, NewLimit(10**6 + 10 + i, Side.BUY, 190 - i, 1000, owner=1)) for i in range(5)]
+    trades, nid = [], 1
+    for k in range(60):  # 60 parent orders alternating side; each printed as 3 same-instant fills
+        for _ in range(3):
+            trades.append(((10 + k) * 10**8, NewMarket(nid, Side.BUY if k % 2 == 0 else Side.SELL, 1, owner=2))); nid += 1
+    res = Simulator(SimConfig(horizon_s=30.0, seed_levels=0, warmup_s=0, sample_interval_s=0.1),
+                    [Scripted(asks + bids, "book", feed="none"), Scripted(trades, "flow", feed="none")]).run()
+    raw = summarize_window(res, 0, 30 * 10**9, merge_bursts=False)
+    mrg = summarize_window(res, 0, 30 * 10**9, merge_bursts=True)
+    assert mrg["n_aggressive"] == 60 and raw["n_aggressive"] == 180  # 3 prints per parent order
+    assert raw["sign_acf1"] > 0.3 and mrg["sign_acf1"] < -0.9  # unmerged: bursts look persistent; merged: strict alternation

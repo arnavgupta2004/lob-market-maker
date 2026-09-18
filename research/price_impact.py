@@ -118,3 +118,21 @@ def bin_table(stats: dict[int, np.ndarray], edges: Sequence[float]) -> list[dict
         rows.append(dict(bin=i, q_lo=edges[i], q_hi=edges[i + 1] if i + 1 < len(edges) else float("inf"),
                          n=int(n), mean_q=sq / n, mean_impact=mean, se=se))
     return rows
+
+
+def merge_bursts(ao: AggressiveOrders) -> AggressiveOrders:
+    """Merge aggressive orders that share a timestamp, side and owner into one parent order.
+
+    An exchange that prints one trade per fill reports a single order sweeping several price levels as a *burst* of prints at the same
+    instant; treating each print as an order understates the size of the parent order. The merged order has the summed quantity, the
+    pre-trade mid of its first print and the volume-weighted average price."""
+    if len(ao.t) == 0:
+        return ao
+    order = np.lexsort((np.arange(len(ao.t)), ao.side, ao.taker_owner, ao.t))
+    t, s, o = ao.t[order], ao.side[order], ao.taker_owner[order]
+    new = np.r_[True, (t[1:] != t[:-1]) | (s[1:] != s[:-1]) | (o[1:] != o[:-1])]
+    starts = np.flatnonzero(new)
+    q = ao.qty[order]
+    notional = ao.vwap[order] * q
+    qty = np.add.reduceat(q, starts)
+    return AggressiveOrders(t[starts], s[starts], qty, ao.mid_before[order][starts], np.add.reduceat(notional, starts) / qty, o[starts])

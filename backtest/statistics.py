@@ -52,6 +52,34 @@ def paired_diff_ci(a: Sequence[float], b: Sequence[float], n_boot: int = 4000,
     if a.shape != b.shape:
         raise ValueError("paired samples must have equal length")
     d = a - b
+    d = d[~np.isnan(d)]
     lo, hi = bootstrap_ci(d, np.mean, n_boot, alpha, seed)
-    return {"n": int(len(d)), "mean_diff": float(np.nanmean(d)), "ci_lo": lo, "ci_hi": hi,
-            "significant": bool(lo > 0 or hi < 0)}
+    return {"n": int(len(d)), "mean_diff": float(np.mean(d)) if len(d) else float("nan"), "ci_lo": lo, "ci_hi": hi,
+            "significant": bool(lo > 0 or hi < 0), "p_value": bootstrap_p(d, n_boot, seed),
+            "effect_size_dz": float(np.mean(d) / np.std(d, ddof=1)) if len(d) > 1 and np.std(d, ddof=1) > 0 else float("nan")}
+
+
+def bootstrap_p(d: Sequence[float], n_boot: int = 4000, seed: int = 0) -> float:
+    """Two-sided bootstrap p-value for ``mean(d) = 0`` (the smaller tail of the bootstrap distribution of the mean,
+    doubled; floored at 1/n_boot). A *resampling* p-value: it assumes sessions are i.i.d. and is only as good as the sample."""
+    d = np.asarray(d, dtype=float)
+    d = d[~np.isnan(d)]
+    if len(d) < 2:
+        return float("nan")
+    rng = np.random.default_rng(seed)
+    boots = d[rng.integers(0, len(d), size=(n_boot, len(d)))].mean(axis=1)
+    p = 2 * min(np.mean(boots <= 0), np.mean(boots >= 0))
+    return float(min(1.0, max(p, 1.0 / n_boot)))
+
+
+def holm(pvalues: Sequence[float]) -> list[float]:
+    """Holm-Bonferroni adjusted p-values (controls the family-wise error rate over a family of comparisons)."""
+    p = np.asarray(pvalues, dtype=float)
+    order = np.argsort(p)
+    m = len(p)
+    adj = np.empty(m)
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, (m - rank) * p[i])
+        adj[i] = min(1.0, running)
+    return adj.tolist()

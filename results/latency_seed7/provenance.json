@@ -1,0 +1,140 @@
+{
+  "command": "python -m experiments.run latency --seed 7 --workers 8 --out /tmp/lat7",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 69.66774201393127,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "latency",
+  "git": {
+    "commit": "4811f749ee71168c561b912bf18ff79035e2ee4d",
+    "dirty": true
+  },
+  "parameters": {
+    "arms": [
+      "as_gamma0.01",
+      "adaptive_full",
+      "adaptive_no_latency_term"
+    ],
+    "calibration": {
+      "informed": {
+        "beta_obi": 0.6593816195571421,
+        "beta_obi_sd_across_sessions": 0.14720956175511754,
+        "fill_model": {
+          "b_d": -0.47897984420030304,
+          "b_q": -0.14940531241816224,
+          "horizon_s": 1.0,
+          "intercept": 1.0778903313808046
+        },
+        "k": 0.5517772316791014,
+        "k_ci": [
+          0.523403050776286,
+          0.5769933648037917
+        ],
+        "obi_horizon_s": 0.25
+      },
+      "informed_jump": {
+        "beta_obi": 0.6515562073980181,
+        "beta_obi_sd_across_sessions": 0.08748329999630411,
+        "fill_model": {
+          "b_d": -0.4986187769056507,
+          "b_q": -0.1728766749033886,
+          "horizon_s": 1.0,
+          "intercept": 1.2479599586449348
+        },
+        "k": 0.534817464352219,
+        "k_ci": [
+          0.5119398880277687,
+          0.5584107679952667
+        ],
+        "obi_horizon_s": 0.25
+      }
+    },
+    "calibration_seeds": [
+      750000,
+      750001,
+      750002,
+      750003,
+      750004,
+      750005,
+      750006,
+      750007,
+      750008,
+      750009,
+      750010,
+      750011
+    ],
+    "environments": {
+      "informed": {
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      },
+      "informed_jump": {
+        "fundamental": {
+          "dt_s": 0.01,
+          "jump_rate": 0.2,
+          "jump_sigma": 0.05,
+          "kappa": 0.0,
+          "mu": null,
+          "sigma": 0.03
+        },
+        "informed": {
+          "imbalance_levels": 3,
+          "imbalance_scale": 5.0,
+          "lookback_s": 1.0,
+          "max_size": 1000,
+          "rate": 10.0,
+          "signal_noise": 0.0,
+          "size": {
+            "median": 5.0,
+            "sigma": 0.8
+          },
+          "threshold": 1.0,
+          "w_imbalance": 0.0,
+          "w_momentum": 0.0,
+          "w_value": 1.0
+        }
+      }
+    },
+    "horizon_s": 180.0,
+    "latencies_ms": [
+      0.0,
+      1.0,
+      5.0,
+      10.0,
+      25.0,
+      50.0
+    ],
+    "sessions": 24
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "calibration.json": "575a352d60e896c3f94232bd3affd8dc6acbc30819c597e06b2fa2204862315a",
+    "latency.png": "c694261cc1d02b38f720f8fc951cdb64d0870c1b6e62e487be47713449d4745e",
+    "sessions.parquet": "5fc49c72d7ada48bd80710a806ef310f3dc1bc42d6f18d351541ad9b5a868fd4",
+    "summary.csv": "29d3d6b092d741765b3933d689b8eea67fe410556d563341184cca69ceeeeb00"
+  },
+  "seed": 7,
+  "session_seeds": {
+    "base": 700000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789774361
+}
