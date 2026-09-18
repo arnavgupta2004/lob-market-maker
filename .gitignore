@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.hypothesis/
+build/
+*.so
+*.dylib
+.DS_Store
+# large raw datasets are downloaded on demand (see data/README.md)
+data/raw/
+# experiment outputs are regenerated from the CLI; only curated results are committed
+results/*
+!results/.gitkeep

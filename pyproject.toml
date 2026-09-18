@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lob-market-maker"
+version = "0.1.0"
+description = "Research-grade limit order book, market-making and microstructure simulation framework"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+    "pyarrow>=14",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "hypothesis>=6.100",
+    "pybind11>=2.12",
+    "cmake>=3.26",
+    "ninja",
+]
+
+[tool.setuptools.packages.find]
+include = ["engine*", "simulator*", "strategies*", "research*", "backtest*", "experiments*", "benchmarks*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "slow: long-running randomized tests",
+    "cpp: requires the compiled C++ extension",
+]
