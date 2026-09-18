@@ -10,6 +10,6 @@ build/
 .DS_Store
 # large raw datasets are downloaded on demand (see data/README.md)
 data/raw/
-# experiment outputs are regenerated from the CLI; only curated results are committed
-results/*
-!results/.gitkeep
+# experiment outputs are reproducible from the CLI (provenance.json records seed + git commit);
+# full-size results are committed, smoke-test ("quick") outputs are not
+results/**/quick/

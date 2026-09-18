@@ -26,13 +26,16 @@ class MarketRecorder:
     """
 
     depth_levels: int = 5
+    pre_mid: float = _NAN  # mid just before the command being processed (set by the simulator)
     _rows: list = field(default_factory=list)
     _trades: list = field(default_factory=list)
+    _mid_before: list = field(default_factory=list)
 
     def on_event(self, ev: Event) -> None:
         if ev.type is EventType.TRADE:
             # (t_ns, price_ticks, qty, aggressor_sign, taker_owner, maker_owner)
             self._trades.append((ev.ts, ev.price, ev.qty, int(ev.side), ev.owner, ev.maker_owner))
+            self._mid_before.append(self.pre_mid)
 
     def sample(self, t: int, book: OrderBook, fundamental_ticks: float = _NAN) -> None:
         b, a = book.best_bid(), book.best_ask()
@@ -56,6 +59,10 @@ class MarketRecorder:
         return {c: arr[:, i] for i, c in enumerate(SAMPLE_COLUMNS)}
 
     def trades(self) -> dict[str, np.ndarray]:
+        """Trade tape. ``mid_before`` is the mid (ticks) just before the *command* that caused
+        the trade, i.e. the reference price for measuring spread capture; nan if one-sided."""
         cols = ("t_ns", "price", "qty", "aggressor", "taker_owner", "maker_owner")
         arr = np.array(self._trades, dtype=np.int64).reshape(-1, len(cols))
-        return {c: arr[:, i] for i, c in enumerate(cols)}
+        out = {c: arr[:, i] for i, c in enumerate(cols)}
+        out["mid_before"] = np.array(self._mid_before, dtype=float)
+        return out

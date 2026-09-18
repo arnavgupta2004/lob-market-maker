@@ -1,0 +1,153 @@
+{
+  "command": "python -m experiments.run inventory --seed 42 --workers 8",
+  "dataset": "synthetic (no external data)",
+  "elapsed_s": 32.24793601036072,
+  "environment": {
+    "numpy": "2.5.3",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "python": "3.13.2",
+    "scipy": "1.18.1"
+  },
+  "experiment": "inventory",
+  "git": {
+    "commit": "9cc15c4f107d9e3394682f2fcf44a7d7253dbd2b",
+    "dirty": true
+  },
+  "parameters": {
+    "AS_horizon_T_s": 5.0,
+    "calibration": {
+      "informed": {
+        "A": 3.958521919411797,
+        "k": 0.5652427496657185,
+        "k_ci": [
+          0.5272370456855056,
+          0.5976059632599404
+        ],
+        "r2": 0.9329243213027822
+      },
+      "noise": {
+        "A": 3.0644682379081467,
+        "k": 0.9388129235876298,
+        "k_ci": [
+          0.8544909709740294,
+          0.9940321039140756
+        ],
+        "r2": 0.918925384248822
+      }
+    },
+    "calibration_seeds": [
+      4250000,
+      4250001,
+      4250002,
+      4250003,
+      4250004,
+      4250005,
+      4250006,
+      4250007,
+      4250008,
+      4250009,
+      4250010,
+      4250011
+    ],
+    "example_scenario": {
+      "informed": null,
+      "mm": {
+        "fees": {
+          "maker_bps": 0.0,
+          "taker_bps": 0.0
+        },
+        "flatten_on_kill": true,
+        "gamma": 0.05,
+        "horizon_s": 5.0,
+        "inventory_limit": 50,
+        "k": 0.9388129235876298,
+        "kill_inventory": 100,
+        "latency": {
+          "feed": {
+            "ns": 0
+          },
+          "order": {
+            "ns": 0
+          }
+        },
+        "max_drawdown": Infinity,
+        "max_quote_offset_ticks": 20,
+        "quote_size": 5,
+        "requote_interval_s": 0.1,
+        "requote_on_fill": true,
+        "sigma": null,
+        "sigma0": 2.0,
+        "sigma_bounds": [
+          0.05,
+          10.0
+        ],
+        "start_s": 5.0,
+        "tau_mode": "restart",
+        "vol_halflife_s": 10.0
+      },
+      "name": "noise_g0.05",
+      "noise": {
+        "cancel_rate": 1.0,
+        "limit_rate": 50.0,
+        "market_rate": 15.0,
+        "market_size": {
+          "median": 5.0,
+          "sigma": 0.8
+        },
+        "max_size": 1000,
+        "offset": {
+          "scale": 3.0
+        },
+        "p_buy": 0.5,
+        "size": {
+          "median": 5.0,
+          "sigma": 0.8
+        }
+      },
+      "sim": {
+        "fundamental": {
+          "dt_s": 0.01,
+          "kappa": 0.0,
+          "mu": null,
+          "sigma": 0.03
+        },
+        "horizon_s": 180.0,
+        "mid0_ticks": 10000,
+        "record_commands": true,
+        "record_events": true,
+        "sample_interval_s": 0.1,
+        "seed": 0,
+        "seed_gap_ticks": 1,
+        "seed_levels": 3,
+        "seed_size": 10,
+        "tick_size": 0.01,
+        "warmup_s": 5.0
+      }
+    },
+    "gammas": [
+      0.0,
+      0.005,
+      0.01,
+      0.02,
+      0.05,
+      0.1,
+      0.2
+    ],
+    "horizon_s": 180.0,
+    "sessions": 30
+  },
+  "quick_mode": false,
+  "result_file_sha256": {
+    "failures_unguarded.csv": "8522a248c4b13eeeca65efd359f5fb15f31f6b73ab3fadc125c80bd34b424b8f",
+    "inventory.png": "cf30a440d92260d4f4577a09205df331bcbeffc3a24745dd01eac7e9d702e0c6",
+    "sessions.csv": "ae50d4f8c0ff3465d9fe35ada0490eac53fdfde77d4bdadddbaf2d89bc3d174f",
+    "summary.csv": "4f11df99fd860974c714916ad0505ebead733cce5b5e7866349d0e6e5f7a90dc",
+    "summary.json": "288b1910a5117e1570f0b4882c86b4b0db81ebcb5fcc6b9e38387f90d65c11db"
+  },
+  "seed": 42,
+  "session_seeds": {
+    "base": 4200000,
+    "scheme": "seed = base + session_index"
+  },
+  "written_at_unix": 1789766024
+}

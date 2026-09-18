@@ -206,6 +206,8 @@ class Simulator:
         if self.cfg.record_commands:
             self._commands.append(cmd)
         self._n_commands += 1
+        m = self.book.mid_price()
+        self.recorder.pre_mid = float("nan") if m is None else m
         events = self.book.process(cmd)
         self.mid_history.update(t, self.book.mid_price())
         if events and (self._all_feed or self._own_feed):
